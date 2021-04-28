@@ -1,0 +1,23 @@
+plugins {
+    id 'java'
+}
+
+group 'glorious.screwdriver'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+
+    implementation 'org.javacord:javacord:3.3.0'
+}
+
+test {
+    useJUnitPlatform()
+}
