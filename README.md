@@ -1,3 +1,4 @@
+[<img src="https://media-exp1.licdn.com/dms/image/C4E0BAQFs9-Tb3byeRw/company-logo_200_200/0/1551991896295?e=2159024400&v=beta&t=53ee8Pw1Rj9IgUvE9tWnC0omFBGiGXSsuh8ODp9LLDM" width="60"/>](https://github.com/user/repository/subscription)
 # Симулятор жызни
 Бот позволяет играть в _крутую_ игру на сервере
 ## Участники
