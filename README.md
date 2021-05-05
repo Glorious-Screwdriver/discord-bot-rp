@@ -1,7 +1,7 @@
 [<img src="https://media-exp1.licdn.com/dms/image/C4E0BAQFs9-Tb3byeRw/company-logo_200_200/0/1551991896295?e=2159024400&v=beta&t=53ee8Pw1Rj9IgUvE9tWnC0omFBGiGXSsuh8ODp9LLDM" width="60"/>](https://miro.com/welcomeonboard/9KxBhnqQZx5NS9zbJAW80O1n8GKIP0MAcfcIWYxgmfDd0Bk6zpxBpSFgoOLZlSmg)
 
 # Prog.io
-Бот позволяет играть в *крутую* игру на сервере
+Бот позволяет играть в *крутую* игру на сервере.
 
 ## Участники
 1. **Вячеслав Цветков P3123**
@@ -39,6 +39,5 @@
 * Особые многопользовательские испытания с повышенными наградами.
 
 ## Детали реализации
-В проекте используется библиотека [JavaCord](https://javacord.org/).
-
-Программа будет запущена в облачном сервисе, чтобы игра была доступна в любое время.
+* В проекте используется библиотека [JavaCord](https://javacord.org/).
+* Программа будет запущена в облачном сервисе, чтобы игра была доступна в любое время.
