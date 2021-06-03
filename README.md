@@ -3,7 +3,7 @@
 
 ## Материалы
 - High Level Overview: [HLO.md](HLO.md)
-- Design Document: *TODO*
+- Design Document: [DD.md](DD.md)
 
 ## Как начать играть?
 *Work in progress...*
