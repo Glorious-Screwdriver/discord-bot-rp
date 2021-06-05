@@ -1,0 +1,2 @@
+Help incoming!
+Just type in !open_console to start the game.
