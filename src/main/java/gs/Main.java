@@ -9,7 +9,7 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) {
-        List<Player> activePlayers = new ArrayList<>();
+        List<Player> active = new ArrayList<>();
 
         String token = "ODM0Nzk0OTEwMzA5NDE3MDAw.YIGFWA.MtuH8-N9XmUIfEQP9FKIzuxi5nc";
         DiscordApi api = new DiscordApiBuilder()
@@ -17,7 +17,7 @@ public class Main {
                 .login()
                 .join();
 
-        api.addMessageCreateListener(new MainChatListener(activePlayers));
+        api.addMessageCreateListener(new MainChatListener(active));
 
         System.out.println("Bot started!");
     }

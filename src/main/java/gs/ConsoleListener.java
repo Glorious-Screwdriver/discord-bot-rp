@@ -7,12 +7,12 @@ import org.javacord.api.listener.message.MessageCreateListener;
 import java.util.List;
 
 public class ConsoleListener implements MessageCreateListener {
-    List<Player> activePlayers;
+    List<Player> active;
     Player player;
     TextChannel channel;
 
-    public ConsoleListener(List<Player> activePlayers, Player player) {
-        this.activePlayers = activePlayers;
+    public ConsoleListener(List<Player> active, Player player) {
+        this.active = active;
         this.player = player;
         this.channel = player.console.getChannel();
     }
@@ -22,9 +22,10 @@ public class ConsoleListener implements MessageCreateListener {
         String msg = event.getMessageContent();
 
         if (msg.equalsIgnoreCase("quit")) {
-            channel.sendMessage("> Closing console...");
+            channel.sendMessage("Closing console...");
             channel.asServerChannel().get().delete("Close console command");
-            activePlayers.remove(player);
+            active.remove(player);
+            System.out.println("Player disconnected. Active players now: " + active.toString());
         }
     }
 }
