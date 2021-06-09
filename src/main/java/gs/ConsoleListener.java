@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.*;
 import java.util.List;
 
 public class ConsoleListener implements MessageCreateListener {
@@ -31,7 +32,39 @@ public class ConsoleListener implements MessageCreateListener {
     public void onMessageCreate(MessageCreateEvent event) {
         String msg = event.getMessageContent();
 
-        // Здесь будут if-ы, проверяющие consoleState
+        if (consoleState == ConsoleState.INVENTORY) {
+            if (msg.contains("use")) {
+                String content = msg.replace("use", "").replace(" ", "");
+                int itemNumber;
+
+                try {
+                    itemNumber = Integer.parseInt(content);
+                } catch (NumberFormatException e) {
+                    e.printStackTrace();
+                    channel.sendMessage("Wrong number format!");
+                    return;
+                }
+
+                ArrayList<Item> items = new ArrayList<>();
+                for (Map.Entry<Item, Integer> entry : player.inventory.entrySet()) {
+                    items.add(entry.getKey());
+                }
+
+                Item item = items.get(itemNumber - 1);
+
+                // ENERGY SUPPLY
+                if (item.getType() == 0) {
+                    EnergySupply energySupply = (EnergySupply) item;
+                    player.updateEnergy(energySupply.getProvidedEnergy());
+                    channel.sendMessage(String.format("Energy restored! You now have %d/%d",
+                            player.getEnergy(),
+                            player.getMaxEnergy()
+                    ));
+                }
+
+                return;
+            }
+        }
 
         if (msg.equalsIgnoreCase("home")) {
             draw(consoleState = ConsoleState.HOME);
@@ -84,7 +117,19 @@ public class ConsoleListener implements MessageCreateListener {
         } else if (consoleState == ConsoleState.CASE) {
             channel.sendMessage("CASE environment is not supported yet!");
         } else if (consoleState == ConsoleState.INVENTORY) {
-            channel.sendMessage("INVENTORY environment is not supported yet!");
+            EmbedBuilder embedBuilder = new EmbedBuilder()
+                    .setTitle("INVENTORY")
+                    .setDescription("These are the things you own.")
+                    .setColor(Color.BLUE);
+
+            for (Map.Entry<Item, Integer> entry : player.inventory.entrySet()) {
+                embedBuilder.addField(
+                        entry.getKey().getName(),
+                        String.valueOf(entry.getValue())
+                );
+            }
+
+            new MessageBuilder().setEmbed(embedBuilder).send(channel);
         } else if (consoleState == ConsoleState.SHOP) {
             channel.sendMessage("SHOP environment is not supported yet!");
         } else if (consoleState == ConsoleState.ACHIEVEMENTS) {

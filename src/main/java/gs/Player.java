@@ -1,7 +1,6 @@
 package gs;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Player {
     private final long id;
@@ -11,7 +10,7 @@ public class Player {
     private int money;
     private int energy;
     private int maxEnergy;
-    public List<Item> inventory;
+    public Map<Item, Integer> inventory;
     PlayerStatistics statistics;
 
     public long getId() {
@@ -34,6 +33,10 @@ public class Player {
         return energy;
     }
 
+    public void updateEnergy(int n) {
+        this.energy += n;
+    }
+
     public int getMaxEnergy() {
         return maxEnergy;
     }
@@ -49,7 +52,10 @@ public class Player {
         level = 1;
         money = 100;
         energy = maxEnergy = 5;
-        inventory = new ArrayList<>();
+        inventory = new HashMap<>();
+
+        // tests
+        inventory.put(new EnergySupply("Coffee", 120, "Coffee, c'mon.", 1, 1), 1);
     }
 
     @Override
