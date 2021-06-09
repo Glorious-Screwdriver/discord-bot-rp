@@ -1,5 +1,6 @@
 package gs;
 
+import gs.util.ConsoleState;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.Permissionable;
 import org.javacord.api.entity.channel.ChannelCategoryBuilder;
@@ -42,7 +43,7 @@ public class MainChatListener implements MessageCreateListener {
             MessageAuthor author = event.getMessageAuthor();
 
             for (Player player : active) {
-                if (player.id == author.getId()) {
+                if (player.getId() == author.getId()) {
                     event.getChannel().sendMessage("Console is already opened!");
                     return;
                 }
@@ -54,7 +55,7 @@ public class MainChatListener implements MessageCreateListener {
             String discriminator = author.getDiscriminator()
                     .orElseThrow(() -> new RuntimeException("Discriminator is not present"));
 
-            ServerTextChannel console = new ServerTextChannelBuilder(server)
+            ServerTextChannel channel = new ServerTextChannelBuilder(server)
                     .setName("console-" + discriminator)
                     .addPermissionOverwrite(server.getEveryoneRole(),
                             new PermissionsBuilder()
@@ -78,14 +79,14 @@ public class MainChatListener implements MessageCreateListener {
             Player player = new Player(
                     author.getId(),
                     author.getDisplayName(),
-                    discriminator,
-                    new Console(console)
+                    discriminator
             );
             active.add(player);
             System.out.println("New player arrived. Active players now: " + active.toString());
 
-            console.addMessageCreateListener(new ConsoleListener(active, player));
-            console.sendMessage("Console opened, sir.");
+            ConsoleListener console = new ConsoleListener(active, player, channel);
+            channel.addMessageCreateListener(console);
+            console.drawHomeScreen();
 
         } else if (msg.equalsIgnoreCase("!clear")) {
             Server server = event.getServer()
