@@ -1,6 +1,8 @@
 package gs;
 
+import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.Permissionable;
+import org.javacord.api.entity.channel.ChannelCategoryBuilder;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerTextChannelBuilder;
 import org.javacord.api.entity.message.MessageAuthor;
@@ -20,9 +22,11 @@ import java.util.List;
 import java.util.Optional;
 
 public class MainChatListener implements MessageCreateListener {
+    DiscordApi api;
     List<Player> active;
 
-    public MainChatListener(List<Player> active) {
+    public MainChatListener(DiscordApi api, List<Player> active) {
+        this.api = api;
         this.active = active;
     }
 
@@ -51,7 +55,23 @@ public class MainChatListener implements MessageCreateListener {
                     .orElseThrow(() -> new RuntimeException("Discriminator is not present"));
 
             ServerTextChannel console = new ServerTextChannelBuilder(server)
-                    .setName("Console-" + discriminator)
+                    .setName("console-" + discriminator)
+                    .addPermissionOverwrite(server.getEveryoneRole(),
+                            new PermissionsBuilder()
+                                    .setState(PermissionType.READ_MESSAGES, PermissionState.DENIED)
+                                    .build()
+                    )
+                    .addPermissionOverwrite(
+                            author.asUser()
+                                    .orElseThrow(() -> new RuntimeException("User is not present")),
+                            new PermissionsBuilder()
+                                    .setState(PermissionType.READ_MESSAGES, PermissionState.ALLOWED)
+                                    .build())
+                    .addPermissionOverwrite(
+                            api.getYourself(),
+                            new PermissionsBuilder()
+                                    .setState(PermissionType.READ_MESSAGES, PermissionState.ALLOWED)
+                                    .build())
                     .create()
                     .join();
 
@@ -93,6 +113,6 @@ public class MainChatListener implements MessageCreateListener {
             e.printStackTrace();
         }
 
-        throw new IllegalStateException("No MCP-help file");
+        throw new IllegalStateException("No MCL-help file");
     }
 }

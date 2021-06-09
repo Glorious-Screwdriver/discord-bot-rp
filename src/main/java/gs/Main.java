@@ -2,6 +2,7 @@ package gs;
 
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
+import org.javacord.api.entity.channel.ServerTextChannel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +18,16 @@ public class Main {
                 .login()
                 .join();
 
-        api.addMessageCreateListener(new MainChatListener(active));
+        api.getServers().forEach(server -> {
+            List<ServerTextChannel> channels = server.getTextChannelsByNameIgnoreCase("info");
+            if (channels.size() == 1) {
+                channels.get(0).addMessageCreateListener(new MainChatListener(api, active));
+            } else {
+                throw new IllegalStateException("Wrong quantity of channels named \"info\"");
+            }
+        });
+
+//        api.addMessageCreateListener(new MainChatListener(active));
 
         System.out.println("Bot started!");
     }

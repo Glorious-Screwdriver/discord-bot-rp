@@ -35,7 +35,8 @@ public class ConsoleListener implements MessageCreateListener {
         } else if (msg.equalsIgnoreCase("help")) {
             channel.sendMessage(getHelpString());
         } else {
-            channel.sendMessage("Undefined command. For more information type in \"help\".");
+            if (!event.getMessageAuthor().isYourself())
+                channel.sendMessage("Undefined command. For more information type in \"help\".");
         }
     }
 
@@ -48,6 +49,6 @@ public class ConsoleListener implements MessageCreateListener {
             e.printStackTrace();
         }
 
-        throw new IllegalStateException("No MCP-help file");
+        throw new IllegalStateException("No CCL-help file");
     }
 }
