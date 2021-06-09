@@ -1,18 +1,25 @@
 package gs;
 
+import org.javacord.api.entity.Permissionable;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerTextChannelBuilder;
 import org.javacord.api.entity.message.MessageAuthor;
 import org.javacord.api.entity.message.MessageBuilder;
+import org.javacord.api.entity.permission.PermissionState;
+import org.javacord.api.entity.permission.PermissionType;
+import org.javacord.api.entity.permission.PermissionsBuilder;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.listener.message.MessageCreateListener;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
 public class MainChatListener implements MessageCreateListener {
-//    Path helpFilePath = Paths.get("src/main/java/gs/materials/MCL-help.txt");
     List<Player> active;
 
     public MainChatListener(List<Player> active) {
@@ -25,10 +32,8 @@ public class MainChatListener implements MessageCreateListener {
 
         if (msg.equalsIgnoreCase("!help")) {
             new MessageBuilder()
-                    .append("!console - open console\n")
-                    .append("!clear - close all opened consoles and delete all players from active")
+                    .append(getHelpString())
                     .send(event.getChannel());
-
         } else if (msg.equalsIgnoreCase("!console")) {
             MessageAuthor author = event.getMessageAuthor();
 
@@ -39,13 +44,11 @@ public class MainChatListener implements MessageCreateListener {
                 }
             }
 
-            Optional<Server> optionalServer = event.getServer();
-            if (!optionalServer.isPresent()) throw new RuntimeException("Server is not present");
-            Server server = optionalServer.get();
+            Server server = event.getServer()
+                    .orElseThrow(() -> new RuntimeException("Server is not present"));
 
-            Optional<String> optionalDiscriminator = author.getDiscriminator();
-            if (!optionalDiscriminator.isPresent()) throw new RuntimeException("Discriminator is not present");
-            String discriminator = optionalDiscriminator.get();
+            String discriminator = author.getDiscriminator()
+                    .orElseThrow(() -> new RuntimeException("Discriminator is not present"));
 
             ServerTextChannel console = new ServerTextChannelBuilder(server)
                     .setName("Console-" + discriminator)
@@ -65,9 +68,8 @@ public class MainChatListener implements MessageCreateListener {
             console.sendMessage("Console opened, sir.");
 
         } else if (msg.equalsIgnoreCase("!clear")) {
-            Optional<Server> optionalServer = event.getServer();
-            if (!optionalServer.isPresent()) throw new RuntimeException("Server is not present");
-            Server server = optionalServer.get();
+            Server server = event.getServer()
+                    .orElseThrow(() -> new RuntimeException("Server is not present"));
 
             List<ServerTextChannel> channels = server.getTextChannels();
 
@@ -80,5 +82,17 @@ public class MainChatListener implements MessageCreateListener {
             active.clear();
             System.out.println("All players and consoles deleted.");
         }
+    }
+
+    private String getHelpString() {
+        Path helpFilePath = Paths.get("src/main/java/gs/materials/MCL-help.txt");
+
+        try {
+            return String.join("\n", Files.readAllLines(helpFilePath));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        throw new IllegalStateException("No MCP-help file");
     }
 }

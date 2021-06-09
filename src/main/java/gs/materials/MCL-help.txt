@@ -1,2 +1,2 @@
-Help incoming!
-Just type in !open_console to start the game.
+!console - open console
+!clear - close all opened consoles and delete all players from active
