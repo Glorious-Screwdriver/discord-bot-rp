@@ -1,7 +1,7 @@
 package gs;
 
-import gs.service.EnergySupply;
-import gs.service.Item;
+import gs.service.items.EnergySupply;
+import gs.service.items.Item;
 import gs.service.Player;
 import gs.util.ConsoleState;
 import org.javacord.api.entity.channel.TextChannel;

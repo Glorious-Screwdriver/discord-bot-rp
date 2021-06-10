@@ -1,4 +1,4 @@
-package gs.service;
+package gs.service.items;
 
 public class GraphicsCard extends Item {
     private final int efficiency;

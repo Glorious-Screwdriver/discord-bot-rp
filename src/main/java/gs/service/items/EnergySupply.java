@@ -1,4 +1,4 @@
-package gs.service;
+package gs.service.items;
 
 public class EnergySupply extends Item {
     private final int providedEnergy;
