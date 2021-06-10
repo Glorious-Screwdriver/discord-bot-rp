@@ -1,0 +1,2 @@
+--- Inventory help ---
+To apply item type in: use <item number>

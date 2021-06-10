@@ -1,25 +1,29 @@
 package gs;
 
-public class Item implements Comparable {
-    protected int type;
+public class Item implements Comparable<Item> {
     protected String name;
-    protected int price = 0;
-    protected String description = null;
-    protected int requiredLevel = 0;
+    protected String description;
+    protected int price;
+    protected int requiredLevel;
+
     public String getName() {
         return name;
     }
 
-    public int getType() {
-        return type;
+    public String getDescription() {
+        return description;
+    }
+
+    public int getPrice() {
+        return price;
+    }
+
+    public int getRequiredLevel() {
+        return requiredLevel;
     }
 
     @Override
-    public int compareTo(Object o) {
-        if (o.getClass() == Item.class) {
-            return name.compareTo(((Item) o).getName());
-        }
-
-        throw new IllegalArgumentException("Comparing with non-Item object");
+    public int compareTo(Item o) {
+        return name.compareTo(o.getName());
     }
 }

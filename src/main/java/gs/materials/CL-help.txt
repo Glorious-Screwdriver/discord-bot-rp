@@ -1,3 +1,4 @@
-home - stats
+--- Help ---
+home - information about player
 inventory - list of your items
 quit - exit the console

@@ -9,7 +9,6 @@ public class Player {
     private int level;
     private int money;
     private int energy;
-    private int maxEnergy;
     public Map<Item, Integer> inventory;
     PlayerStatistics statistics;
 
@@ -19,6 +18,10 @@ public class Player {
 
     public String getDisplayName() {
         return displayName;
+    }
+
+    public String getDiscriminator() {
+        return discriminator;
     }
 
     public int getLevel() {
@@ -33,16 +36,8 @@ public class Player {
         return energy;
     }
 
-    public void updateEnergy(int n) {
-        this.energy += n;
-    }
-
     public int getMaxEnergy() {
-        return maxEnergy;
-    }
-
-    public PlayerStatistics getStatistics() {
-        return statistics;
+        return 4 + level;
     }
 
     public Player(long id, String displayName, String discriminator) {
@@ -51,11 +46,15 @@ public class Player {
         this.discriminator = discriminator;
         level = 1;
         money = 100;
-        energy = maxEnergy = 5;
+        energy = 5;
         inventory = new HashMap<>();
 
         // tests
-        inventory.put(new EnergySupply("Coffee", 120, "Coffee, c'mon.", 1, 1), 1);
+        inventory.put(new EnergySupply("Coffee", 1), 2);
+    }
+
+    public void updateEnergy(int x) {
+        energy += x;
     }
 
     @Override
