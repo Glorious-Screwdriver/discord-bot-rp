@@ -31,109 +31,99 @@ public class ConsoleListener implements MessageCreateListener {
     @Override
     public void onMessageCreate(MessageCreateEvent event) {
         String msg = event.getMessageContent();
+        if (event.getMessageAuthor().isYourself()) return;
 
         // CONSOLE STATE CHECK
         if (consoleState == ConsoleState.INVENTORY) {
-            if (!event.getMessageAuthor().isYourself())
-                if (msg.toLowerCase().contains("use")) {
-                    String content = msg
-                            .replace("use", "")
-                            .replace(" ", "");
+            if (msg.toLowerCase().contains("use")) {
+                // Getting item number
+                Integer itemNumber = getItemNumber(msg, "use", "inventory-help.txt");
+                if (itemNumber == null) return;
 
-                    int itemNumber;
-                    try {
-                        itemNumber = Integer.parseInt(content);
-                    } catch (NumberFormatException e) {
-                        e.printStackTrace();
-                        sendEnvironmentHelp("inventory-help.txt");
-                        return;
-                    }
+                // Getting item name
+                List<Map.Entry<String, Integer>> list = new ArrayList<>(player.inventory.entrySet());
+                String item = list.get(itemNumber - 1).getKey();
 
-                    ArrayList<Item> items = new ArrayList<>();
-                    for (Map.Entry<Item, Integer> entry : player.inventory.entrySet()) {
-                        items.add(entry.getKey());
-                    }
-
-                    Item item = items.get(itemNumber - 1);
-
-                    // ENERGY SUPPLY
-                    if (item.getClass() == EnergySupply.class) {
-                        EnergySupply energySupply = (EnergySupply) item;
-                        player.updateEnergy(energySupply.getProvidedEnergy());
-                        channel.sendMessage(String.format("Energy restored! You now have %d/%d",
-                                player.getEnergy(),
-                                player.getMaxEnergy()
-                        ));
-                    }
-                    // GRAPHICS CARD
-                    else if (item.getClass() == GraphicsCard.class) {
-                        channel.sendMessage("Using graphics cards is not supported yet!");
-                        //TODO "using" graphics cards
-                    }
-
-                    return;
-                } else if (msg.equalsIgnoreCase("help")) {
-                    sendEnvironmentHelp("inventory-help.txt");
-                    return;
+                // Interpreting item effect
+                if (item.equals("Coffee")) {
+                    player.updateEnergy(1);
+                    channel.sendMessage(String.format(
+                            "You have drank a cup of coffee! Energy: %d/%d",
+                            player.getEnergy(),
+                            player.getMaxEnergy()
+                    ));
+                } else if (item.equals("Energy drink")) {
+                    player.updateEnergy(2);
+                    channel.sendMessage(String.format(
+                            "You have consumed a can of energy drink! Energy: %d/%d",
+                            player.getEnergy(),
+                            player.getMaxEnergy()
+                    ));
                 }
+
+                // Deleting item from inventory
+                if (player.inventory.get(item) == 1) {
+                    player.inventory.remove(item);
+                } else {
+                    player.inventory.replace(item, player.inventory.get(item) - 1);
+                }
+
+                return;
+            } else if (msg.equalsIgnoreCase("help")) {
+                sendEnvironmentHelp("inventory-help.txt");
+                return;
+            }
+
         } else if (consoleState == ConsoleState.SHOP) {
-            if (!event.getMessageAuthor().isYourself()) {
-                if (msg.toLowerCase().contains("buy")) {
-                    String content = msg
-                            .replace("buy", "")
-                            .replace(" ", "");
+            if (msg.toLowerCase().contains("buy")) {
+                // Getting item number
+                Integer itemNumber = getItemNumber(msg, "buy", "shop-help.txt");
+                if (itemNumber == null) return;
 
-                    int itemNumber;
-                    try {
-                        itemNumber = Integer.parseInt(content);
-                    } catch (NumberFormatException e) {
-                        e.printStackTrace();
-                        sendEnvironmentHelp("shop-help.txt");
-                        return;
-                    }
+                // Getting target Item
+                List<Item> shop = shop();
+                Item item = shop.get(itemNumber - 1);
 
-                    List<Item> products = shop();
+                // Purchasing
+                if (player.getMoney() >= item.getPrice() && player.getLevel() >= item.getRequiredLevel()) {
+                    String name = item.getName();
 
-                    Item item = products.get(itemNumber - 1);
-
-                    if (player.getMoney() >= item.getPrice() && player.getLevel() >= item.getRequiredLevel()) {
-                        player.updateMoney(-item.getPrice());
-
-                        if (player.inventory.containsKey(item)) {
-                            player.inventory.replace(item, player.inventory.get(item) + 1);
-                        } else {
-                            player.inventory.put(item, 1);
-                        }
-
-                        System.out.println(player.inventory.toString());
-
-                        channel.sendMessage(String.format("You have purchased %s!\nMoney left: %d",
-                                item.getName(),
-                                player.getMoney()
-                        ));
+                    if (player.inventory.containsKey(name)) {
+                        player.inventory.replace(name, player.inventory.get(name) + 1);
                     } else {
-                        if (player.getMoney() < item.getPrice()) {
-                            channel.sendMessage("Oops! Looks like you don't have enough money ;)");
-                        } else {
-                            channel.sendMessage("Your level not high enough, to buy this item.");
-                        }
-                        return;
+                        player.inventory.put(name, 1);
                     }
 
-                    return;
-                } else if (msg.equalsIgnoreCase("help")) {
-                    sendEnvironmentHelp("shop-help.txt");
+                    System.out.println(player.inventory.toString()); //debug
+
+                    player.updateMoney(-item.getPrice());
+                    channel.sendMessage(String.format(
+                            "You have purchased %s!\nMoney left: %d",
+                            item.getName(),
+                            player.getMoney()
+                    ));
+                } else {
+                    if (player.getMoney() < item.getPrice()) {
+                        channel.sendMessage("Oops! Looks like you don't have enough money ;)");
+                    } else {
+                        channel.sendMessage("Your level not high enough, to buy this item.");
+                    }
                     return;
                 }
+
+                return;
+            } else if (msg.equalsIgnoreCase("help")) {
+                sendEnvironmentHelp("shop-help.txt");
+                return;
             }
         }
 
-        // SWITCH ENVIRONMENT COMMANDS + HELP, QUIT
+        // SWITCH ENVIRONMENT COMMANDS, HELP, QUIT
         if (msg.equalsIgnoreCase("home")) {
             consoleState = ConsoleState.HOME;
             drawHome();
         } else if (msg.equalsIgnoreCase("case")) {
-            consoleState = ConsoleState.CASE;
+//            consoleState = ConsoleState.CASE;
             drawCase();
         } else if (msg.equalsIgnoreCase("inventory")) {
             consoleState = ConsoleState.INVENTORY;
@@ -142,7 +132,7 @@ public class ConsoleListener implements MessageCreateListener {
             consoleState = ConsoleState.SHOP;
             drawShop();
         } else if (msg.equalsIgnoreCase("achievements")) {
-            consoleState = ConsoleState.ACHIEVEMENTS;
+//            consoleState = ConsoleState.ACHIEVEMENTS;
             drawAchievements();
         } else if (msg.equalsIgnoreCase("quit")) {
             channel.sendMessage("Closing console...");
@@ -154,8 +144,7 @@ public class ConsoleListener implements MessageCreateListener {
         } else if (msg.equalsIgnoreCase("help")) {
             sendHomeHelp();
         } else {
-            if (!event.getMessageAuthor().isYourself())
-                channel.sendMessage("Undefined command. For more information type in \"help\".");
+            channel.sendMessage("Undefined command. For more information type in \"help\".");
         }
     }
 
@@ -181,12 +170,7 @@ public class ConsoleListener implements MessageCreateListener {
                 .setDescription("These are the things you own.")
                 .setColor(Color.BLUE);
 
-        for (Map.Entry<Item, Integer> entry : player.inventory.entrySet()) {
-            embedBuilder.addField(
-                    entry.getKey().getName(),
-                    String.valueOf(entry.getValue())
-            );
-        }
+        player.inventory.forEach((key, value) -> embedBuilder.addField(key, String.valueOf(value)));
 
         new MessageBuilder().setEmbed(embedBuilder).send(channel);
     }
@@ -197,10 +181,19 @@ public class ConsoleListener implements MessageCreateListener {
                 .setDescription("The place, where you can buy stuff.")
                 .setColor(Color.GREEN);
 
-        List<Item> products = shop();
+        List<Item> shop = shop();
 
-        for (Item product : products) {
-            embedBuilder.addField(product.getName(), product.getDescription());
+        for (Item product : shop) {
+            if (product.getClass() == EnergySupply.class) {
+                EnergySupply energySupply = (EnergySupply) product;
+                embedBuilder.addField(
+                        energySupply.getName(),
+                        energySupply.getDescription() + "\n" +
+                                "Price: " + energySupply.getPrice() + "\n" +
+                                "Required level: " + energySupply.getRequiredLevel() + "\n" +
+                                "Energy: " + energySupply.getProvidedEnergy()
+                );
+            }
         }
 
         new MessageBuilder().setEmbed(embedBuilder).send(channel);
@@ -212,6 +205,22 @@ public class ConsoleListener implements MessageCreateListener {
 
     public void drawHomeScreen() {
         drawHome();
+    }
+
+    private Integer getItemNumber(String msg, String word, String helpFile) {
+        String content = msg
+                .replace(word, "")
+                .replace(" ", "");
+
+        int itemNumber;
+        try {
+            itemNumber = Integer.parseInt(content);
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            sendEnvironmentHelp(helpFile);
+            return null;
+        }
+        return itemNumber;
     }
 
     private void sendHomeHelp() {
@@ -232,7 +241,7 @@ public class ConsoleListener implements MessageCreateListener {
         try {
             return String.join("\n", Files.readAllLines(helpFilePath));
         } catch (IOException e) {
-            throw new IllegalStateException("No CL-help file", e);
+            throw new IllegalStateException("No help file", e);
         }
     }
 
