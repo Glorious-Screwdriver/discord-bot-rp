@@ -32,6 +32,7 @@ public class ConsoleListener implements MessageCreateListener {
     public void onMessageCreate(MessageCreateEvent event) {
         String msg = event.getMessageContent();
 
+        // CONSOLE STATE CHECK
         if (consoleState == ConsoleState.INVENTORY) {
             if (!event.getMessageAuthor().isYourself())
                 if (msg.toLowerCase().contains("use")) {
@@ -40,12 +41,11 @@ public class ConsoleListener implements MessageCreateListener {
                             .replace(" ", "");
 
                     int itemNumber;
-
                     try {
                         itemNumber = Integer.parseInt(content);
                     } catch (NumberFormatException e) {
                         e.printStackTrace();
-                        sendInventoryHelp();
+                        sendEnvironmentHelp("inventory-help.txt");
                         return;
                     }
 
@@ -68,15 +68,67 @@ public class ConsoleListener implements MessageCreateListener {
                     // GRAPHICS CARD
                     else if (item.getClass() == GraphicsCard.class) {
                         channel.sendMessage("Using graphics cards is not supported yet!");
+                        //TODO "using" graphics cards
                     }
 
                     return;
                 } else if (msg.equalsIgnoreCase("help")) {
-                    sendInventoryHelp();
+                    sendEnvironmentHelp("inventory-help.txt");
                     return;
                 }
+        } else if (consoleState == ConsoleState.SHOP) {
+            if (!event.getMessageAuthor().isYourself()) {
+                if (msg.toLowerCase().contains("buy")) {
+                    String content = msg
+                            .replace("buy", "")
+                            .replace(" ", "");
+
+                    int itemNumber;
+                    try {
+                        itemNumber = Integer.parseInt(content);
+                    } catch (NumberFormatException e) {
+                        e.printStackTrace();
+                        sendEnvironmentHelp("shop-help.txt");
+                        return;
+                    }
+
+                    List<Item> products = shop();
+
+                    Item item = products.get(itemNumber - 1);
+
+                    if (player.getMoney() >= item.getPrice() && player.getLevel() >= item.getRequiredLevel()) {
+                        player.updateMoney(-item.getPrice());
+
+                        if (player.inventory.containsKey(item)) {
+                            player.inventory.replace(item, player.inventory.get(item) + 1);
+                        } else {
+                            player.inventory.put(item, 1);
+                        }
+
+                        System.out.println(player.inventory.toString());
+
+                        channel.sendMessage(String.format("You have purchased %s!\nMoney left: %d",
+                                item.getName(),
+                                player.getMoney()
+                        ));
+                    } else {
+                        if (player.getMoney() < item.getPrice()) {
+                            channel.sendMessage("Oops! Looks like you don't have enough money ;)");
+                        } else {
+                            channel.sendMessage("Your level not high enough, to buy this item.");
+                        }
+                        return;
+                    }
+
+                    return;
+                } else if (msg.equalsIgnoreCase("help")) {
+                    sendEnvironmentHelp("shop-help.txt");
+                    return;
+                }
+            }
         }
 
+        // SWITCH ENVIRONMENT COMMANDS + HELP, QUIT
         if (msg.equalsIgnoreCase("home")) {
             consoleState = ConsoleState.HOME;
             drawHome();
@@ -140,7 +192,18 @@ public class ConsoleListener implements MessageCreateListener {
     }
 
     private void drawShop() {
-        channel.sendMessage("SHOP environment is not supported yet!");
+        EmbedBuilder embedBuilder = new EmbedBuilder()
+                .setTitle("SHOP")
+                .setDescription("The place, where you can buy stuff.")
+                .setColor(Color.GREEN);
+
+        List<Item> products = shop();
+
+        for (Item product : products) {
+            embedBuilder.addField(product.getName(), product.getDescription());
+        }
+
+        new MessageBuilder().setEmbed(embedBuilder).send(channel);
     }
 
     private void drawAchievements() {
@@ -155,9 +218,9 @@ public class ConsoleListener implements MessageCreateListener {
         channel.sendMessage(getHelpString("CL-help.txt"));
     }
 
-    private void sendInventoryHelp() {
+    private void sendEnvironmentHelp(String file) {
         new MessageBuilder()
-                .append(getHelpString("inventory-help.txt")).appendNewLine()
+                .append(getHelpString(file)).appendNewLine()
                 .appendNewLine()
                 .append(getHelpString("CL-help.txt"))
                 .send(channel);
@@ -171,5 +234,13 @@ public class ConsoleListener implements MessageCreateListener {
         } catch (IOException e) {
             throw new IllegalStateException("No CL-help file", e);
         }
+    }
+
+    private List<Item> shop() {
+        return Arrays.asList(
+                new EnergySupply("Coffee", 1, 50, 1),
+                new EnergySupply("Energy drink", 2, 80, 3)
+                //TODO add graphics cards
+        );
     }
 }

@@ -1,4 +1,6 @@
 --- Help ---
 home - information about player
 inventory - list of your items
+shop - buying items
+
 quit - exit the console

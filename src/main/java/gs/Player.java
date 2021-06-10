@@ -50,7 +50,11 @@ public class Player {
         inventory = new HashMap<>();
 
         // tests
-        inventory.put(new EnergySupply("Coffee", 1), 2);
+//        inventory.put(new EnergySupply("Coffee", 1), 2);
+    }
+
+    public void updateMoney(int x) {
+        money += x;
     }
 
     public void updateEnergy(int x) {
