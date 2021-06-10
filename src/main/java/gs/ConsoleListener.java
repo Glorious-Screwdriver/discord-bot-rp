@@ -1,5 +1,8 @@
 package gs;
 
+import gs.service.EnergySupply;
+import gs.service.Item;
+import gs.service.Player;
 import gs.util.ConsoleState;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.MessageBuilder;
@@ -42,7 +45,15 @@ public class ConsoleListener implements MessageCreateListener {
 
                 // Getting item name
                 List<Map.Entry<String, Integer>> list = new ArrayList<>(player.inventory.entrySet());
-                String item = list.get(itemNumber - 1).getKey();
+
+                String item;
+                try {
+                    item = list.get(itemNumber - 1).getKey();
+                } catch (IndexOutOfBoundsException e) {
+                    e.printStackTrace();
+                    channel.sendMessage("Wrong number!");
+                    return;
+                }
 
                 // Interpreting item effect
                 if (item.equals("Coffee")) {
@@ -82,7 +93,14 @@ public class ConsoleListener implements MessageCreateListener {
 
                 // Getting target Item
                 List<Item> shop = shop();
-                Item item = shop.get(itemNumber - 1);
+                Item item;
+                try {
+                    item = shop.get(itemNumber - 1);
+                } catch (IndexOutOfBoundsException e) {
+                    e.printStackTrace();
+                    channel.sendMessage("Wrong number!");
+                    return;
+                }
 
                 // Purchasing
                 if (player.getMoney() >= item.getPrice() && player.getLevel() >= item.getRequiredLevel()) {
@@ -94,8 +112,6 @@ public class ConsoleListener implements MessageCreateListener {
                         player.inventory.put(name, 1);
                     }
 
-                    System.out.println(player.inventory.toString()); //debug
-
                     player.updateMoney(-item.getPrice());
                     channel.sendMessage(String.format(
                             "You have purchased %s!\nMoney left: %d",
@@ -106,7 +122,7 @@ public class ConsoleListener implements MessageCreateListener {
                     if (player.getMoney() < item.getPrice()) {
                         channel.sendMessage("Oops! Looks like you don't have enough money ;)");
                     } else {
-                        channel.sendMessage("Your level not high enough, to buy this item.");
+                        channel.sendMessage("Your level is not high enough to buy this item.");
                     }
                     return;
                 }
@@ -247,8 +263,8 @@ public class ConsoleListener implements MessageCreateListener {
 
     private List<Item> shop() {
         return Arrays.asList(
-                new EnergySupply("Coffee", 1, 50, 1),
-                new EnergySupply("Energy drink", 2, 80, 3)
+                new EnergySupply("Coffee", 50, 1, 1),
+                new EnergySupply("Energy drink", 80, 2, 2)
                 //TODO add graphics cards
         );
     }

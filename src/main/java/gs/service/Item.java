@@ -1,4 +1,4 @@
-package gs;
+package gs.service;
 
 public class Item implements Comparable<Item> {
     protected String name;

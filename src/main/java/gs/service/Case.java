@@ -1,4 +1,4 @@
-package gs;
+package gs.service;
 
 public class Case {
     String name;

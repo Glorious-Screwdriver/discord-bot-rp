@@ -1,9 +1,7 @@
 package gs;
 
-import gs.util.ConsoleState;
+import gs.service.Player;
 import org.javacord.api.DiscordApi;
-import org.javacord.api.entity.Permissionable;
-import org.javacord.api.entity.channel.ChannelCategoryBuilder;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerTextChannelBuilder;
 import org.javacord.api.entity.message.MessageAuthor;
@@ -20,7 +18,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Optional;
 
 public class MainChatListener implements MessageCreateListener {
     DiscordApi api;
