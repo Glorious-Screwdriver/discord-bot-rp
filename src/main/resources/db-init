@@ -1,0 +1,16 @@
+CREATE TABLE `discordbot`.`players` (
+  `id` INT UNIQUE NOT NULL,
+  `name` VARCHAR(45) NOT NULL,
+  `level` INT NOT NULL,
+  `money` INT NOT NULL,
+  `energy` INT NOT NULL,
+  `coffee` INT NOT NULL,
+  `energy_drink` INT NOT NULL,
+  `graphics_card_1` INT NOT NULL,
+  `graphics_card_2` INT NOT NULL,
+  `graphics_card_3` INT NOT NULL,
+  `acquired_money` INT NOT NULL,
+  `cases_done` INT NOT NULL,
+  `coffee_consumed` INT NOT NULL,
+  `energy_drinks_consumed` INT NOT NULL,
+  PRIMARY KEY (`id`));
