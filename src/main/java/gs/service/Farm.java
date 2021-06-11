@@ -33,13 +33,7 @@ public class Farm {
                 }
                 long profit = 0;
                 for (GraphicsCard card : cards) {
-                    boolean sign = random.nextBoolean();
-                    // Элемент случайности
-                    if (sign) {
-                        profit += card.getEfficiency() - Math.round(card.getEfficiency() * random.nextDouble() / 2);
-                    } else {
-                        profit += card.getEfficiency() + Math.round(card.getEfficiency() * random.nextDouble() / 2);
-                    }
+                    profit += Math.round(card.getEfficiency() * (random.nextDouble() + 0.5));
                 }
                 player.updateMoney((int) profit);
                 System.out.println(player.getDisplayName() + "'s farm has produced " + profit);
