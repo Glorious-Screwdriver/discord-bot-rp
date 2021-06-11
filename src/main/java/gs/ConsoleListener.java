@@ -57,59 +57,45 @@ public class ConsoleListener implements MessageCreateListener {
                 }
 
                 // Interpreting item effect
-                if (type.equals("coffee")) {
-                    player.updateEnergy(1);
-                    channel.sendMessage(String.format(
-                            "You have drank a cup of coffee! Energy: %d/%d",
-                            player.getEnergy(),
-                            player.getMaxEnergy()
-                    ));
-                } else if (type.equals("energy_drink")) {
-                    player.updateEnergy(2);
-                    channel.sendMessage(String.format(
-                            "You have consumed a can of energy drink! Energy: %d/%d",
-                            player.getEnergy(),
-                            player.getMaxEnergy()
-                    ));
-                } else if (type.equals("graphics_card_1")) {
-                    boolean added = player.farm.addCard(new GraphicsCard(
-                            "graphics_card_1",
-                            "GTX 680",
-                            300,
-                            2,
-                            10));
-
-                    if (added) {
-                        channel.sendMessage("You have installed GTX 680 in your mining farm.");
-                    } else {
-                        channel.sendMessage("You have reached the limit of graphics cards in you farm!");
-                    }
-                } else if (type.equals("graphics_card_2")) {
-                    boolean added = player.farm.addCard(new GraphicsCard(
-                            "graphics_card_2",
-                            "GTX 970",
-                            1000,
-                            3,
-                            100));
-
-                    if (added) {
-                        channel.sendMessage("You have installed GTX 970 in your mining farm.");
-                    } else {
-                        channel.sendMessage("You have reached the limit of graphics cards in you farm!");
-                    }
-                } else if (type.equals("graphics_card_3")) {
-                    boolean added = player.farm.addCard(new GraphicsCard(
-                            "graphics_card_3",
-                            "Titan Z",
-                            5000,
-                            5,
-                            500));
-
-                    if (added) {
-                        channel.sendMessage("You have installed Titan Z in your mining farm.");
-                    } else {
-                        channel.sendMessage("You have reached the limit of graphics cards in you farm!");
-                    }
+                switch (type) {
+                    case "coffee":
+                        player.updateEnergy(1);
+                        channel.sendMessage(String.format(
+                                "You have drank a cup of coffee! Energy: %d/%d",
+                                player.getEnergy(),
+                                player.getMaxEnergy()
+                        ));
+                        break;
+                    case "energy_drink":
+                        player.updateEnergy(2);
+                        channel.sendMessage(String.format(
+                                "You have consumed a can of energy drink! Energy: %d/%d",
+                                player.getEnergy(),
+                                player.getMaxEnergy()
+                        ));
+                        break;
+                    case "graphics_card_1":
+                    case "graphics_card_2":
+                    case "graphics_card_3":
+                        List<Item> shop = shop();
+                        GraphicsCard card = null;
+                        for (Item product : shop) {
+                            if (product.getType().equals(type)) {
+                                card = (GraphicsCard) product;
+                                break;
+                            }
+                        }
+                        if (card == null) throw new IllegalStateException("Card is null");
+                        boolean added = player.farm.addCard(card);
+                        if (added) {
+                            channel.sendMessage(String.format(
+                                    "You have installed %s in your mining farm.",
+                                    card.getName()
+                            ));
+                        } else {
+                            channel.sendMessage("You have reached the limit of graphics cards in you farm!");
+                        }
+                        break;
                 }
 
                 // Deleting item from inventory
