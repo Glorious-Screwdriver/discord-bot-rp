@@ -8,9 +8,9 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 public class DataBase {
-    private final String URL = "jdbc:mysql://localhost/discordbot";
-    private final String USERNAME = "root";
-    private final String PASSWORD = "root";
+    private final String URL = "jdbc:mysql://25.45.147.225/discordbot";
+    private final String USERNAME = "slava";
+    private final String PASSWORD = "slava";
     Connection connection;
     Statement statement;
 

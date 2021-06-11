@@ -9,21 +9,11 @@ public class Player {
     private int level;
     private int money;
     private int energy;
+
     public LinkedHashMap <String, Integer> inventory;
     public PlayerStatistics statistics;
     public Farm farm;
-
-    public void setLevel(int level) {
-        this.level = level;
-    }
-
-    public void setMoney(int money) {
-        this.money = money;
-    }
-
-    public void setEnergy(int energy) {
-        this.energy = energy;
-    }
+    private Case activeCase;
 
     public Player(long id, String displayName, String discriminator) {
         this.id = id;
@@ -34,10 +24,9 @@ public class Player {
         this.energy = 5;
 
         this.inventory = new LinkedHashMap<>();
-        this.statistics = new PlayerStatistics(0,0,0,0);
-
-        this.farm = new Farm(this);
         this.statistics = new PlayerStatistics();
+        this.farm = new Farm(this);
+        this.activeCase = null;
 //        inventory.put(new EnergySupply("Coffee", 1), 2);
     }
 
@@ -69,12 +58,45 @@ public class Player {
         return 4 + level;
     }
 
+    public Case getActiveCase() {
+        return activeCase;
+    }
+
+    public void updateLevel(int x) {
+        level += x;
+    }
+
     public void updateMoney(int x) {
         money += x;
     }
 
     public void updateEnergy(int x) {
         energy += x;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    public void setMoney(int money) {
+        this.money = money;
+    }
+
+    public void setEnergy(int energy) {
+        this.energy = energy;
+    }
+
+    public boolean setActiveCase(Case newCase) {
+        if (activeCase == null) {
+            activeCase = newCase;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public void clearCase() {
+        activeCase = null;
     }
 
     @Override
