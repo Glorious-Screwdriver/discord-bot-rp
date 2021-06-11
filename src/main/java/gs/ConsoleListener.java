@@ -24,12 +24,14 @@ public class ConsoleListener implements MessageCreateListener {
     Player player;
     TextChannel channel;
     ConsoleState consoleState;
+    DataBase dataBase;
 
-    public ConsoleListener(List<Player> active, Player player, TextChannel channel) {
+    public ConsoleListener(List<Player> active, Player player, TextChannel channel, DataBase dataBase) {
         this.active = active;
         this.player = player;
         this.channel = channel;
         consoleState = ConsoleState.HOME;
+        this.dataBase = dataBase;
     }
 
     @Override
@@ -60,6 +62,8 @@ public class ConsoleListener implements MessageCreateListener {
                 switch (type) {
                     case "coffee":
                         player.updateEnergy(1);
+                        dataBase.increment(player.getId(), "energy", 1);
+                        dataBase.increment(player.getId(), "coffee", -1);
                         channel.sendMessage(String.format(
                                 "You have drank a cup of coffee! Energy: %d/%d",
                                 player.getEnergy(),
@@ -68,6 +72,8 @@ public class ConsoleListener implements MessageCreateListener {
                         break;
                     case "energy_drink":
                         player.updateEnergy(2);
+                        dataBase.increment(player.getId(), "energy", 2);
+                        dataBase.increment(player.getId(), "coffee", -1);
                         channel.sendMessage(String.format(
                                 "You have consumed a can of energy drink! Energy: %d/%d",
                                 player.getEnergy(),
@@ -88,6 +94,8 @@ public class ConsoleListener implements MessageCreateListener {
                         if (card == null) throw new IllegalStateException("Card is null");
                         boolean added = player.farm.addCard(card);
                         if (added) {
+                            dataBase.increment(player.getId(), card.getType(), -1);
+                            dataBase.increment(player.getId(), card.getType()+"_installed", 1);
                             channel.sendMessage(String.format(
                                     "You have installed %s in your mining farm.",
                                     card.getName()
@@ -139,6 +147,8 @@ public class ConsoleListener implements MessageCreateListener {
                     }
 
                     player.updateMoney(-item.getPrice());
+                    dataBase.increment(player.getId(), item.getType(), 1);
+                    dataBase.increment(player.getId(), "money", -item.getPrice());
                     channel.sendMessage(String.format(
                             "You have purchased %s!\nMoney left: %d",
                             item.getName(),
@@ -176,6 +186,8 @@ public class ConsoleListener implements MessageCreateListener {
 
                 // Removing card
                 player.farm.removeCard(card);
+                dataBase.increment(player.getId(), card.getType()+"_installed", -1);
+                dataBase.increment(player.getId(), card.getType(), 1);
                 if (player.inventory.containsKey(card.getType())) {
                     player.inventory.replace(card.getType(), player.inventory.get(card.getType()) + 1);
                 } else {

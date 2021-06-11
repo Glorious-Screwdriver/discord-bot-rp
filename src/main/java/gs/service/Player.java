@@ -29,7 +29,7 @@ public class Player {
         this.id = id;
         this.displayName = displayName;
         this.discriminator = discriminator;
-        this.level = 1;
+        this.level = 5;
         this.money = 300;
         this.energy = 5;
 

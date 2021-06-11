@@ -3,7 +3,6 @@ package gs.service;
 import gs.service.items.GraphicsCard;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -13,14 +12,13 @@ public class Farm {
 
     Player player;
     int income;
-    int limit;
     Thread calculateProfit;
+
 
     public Farm(Player player) {
         this.player = player;
         this.cards = new ArrayList<>();
         this.income = 0;
-        this.limit = 3;
 
         this.calculateProfit = new Thread(() -> {
             Random random = new Random();
@@ -41,28 +39,40 @@ public class Farm {
         });
         calculateProfit.start();
     }
-
+    public void stopCalculatingProfit(){
+        calculateProfit.interrupt();
+    }
     public int getIncome() {
         return income;
     }
 
-    public void updateLimit(int value) {
-        this.limit += value;
+    public int getLimit() {
+        int t = this.player.getLevel()-1;
+        return Math.max(t, 0);
     }
 
     /**
      * Adds a card to the player's farm
+     *
      * @param card Graphics card you want to add
      * @return true - if card is added, false - if there is no space for a new card
      */
     public boolean addCard(GraphicsCard card) {
-        if (cards.size() < limit) {
+        if (cards.size() < getLimit()) {
             cards.add(card);
             income += card.getEfficiency();
             return true;
         } else {
             return false;
         }
+    }
+
+    public boolean addCards(ArrayList<GraphicsCard> cards) {
+        boolean b = true;
+        for (GraphicsCard card : cards) {
+            b &= addCard(card);
+        }
+        return b;
     }
 
     public void removeCard(GraphicsCard card) {

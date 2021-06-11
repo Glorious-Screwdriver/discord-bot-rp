@@ -82,7 +82,7 @@ public class MainChatListener implements MessageCreateListener {
             active.add(dataBase.getPlayer(player));
             System.out.println("New player arrived. Active players now: " + active.toString());
 
-            ConsoleListener console = new ConsoleListener(active, player, channel);
+            ConsoleListener console = new ConsoleListener(active, player, channel, dataBase);
             channel.addMessageCreateListener(console);
             console.drawHomeScreen();
 
