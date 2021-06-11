@@ -14,7 +14,6 @@ public class Farm {
     int income;
     Thread calculateProfit;
 
-
     public Farm(Player player) {
         this.player = player;
         this.cards = new ArrayList<>();

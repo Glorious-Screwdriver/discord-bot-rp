@@ -1,6 +1,6 @@
 Hello world;What Java command will print a simple "Hello world!" string in console?;100;print("Hello World!"),System.out.println("Hello World!"),println("Hello World!");2
 Array;How to setup an array in Java?;300;int[] array = new int[],new array = int[],int array[] = new int[];1
-Abstract class;Abstract class is a class that...;has no purpose.,is designed to provide basic functionality for inherited classes.,has only abstract methods.;2
+Abstract class;Abstract class is a class that...;500;has no purpose.,is designed to provide basic functionality for inherited classes.,has only abstract methods.;2
 JavaScript;Java is short for "JavaScript"?;100;True,False;2
 Comments;How do you insert COMMENTS in Java code?;300;# this is a comment,* this is a comment,// this is a comment;3
 Text variable;Which data type is used to create a variable that should store text?;300;myString,String,Txt,string;2

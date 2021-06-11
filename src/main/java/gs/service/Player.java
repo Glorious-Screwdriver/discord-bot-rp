@@ -3,6 +3,7 @@ package gs.service;
 import gs.service.cases.Case;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class Player {
     private final long id;
@@ -29,7 +30,27 @@ public class Player {
         this.statistics = new PlayerStatistics();
         this.farm = new Farm(this);
         this.activeCase = null;
-//        inventory.put(new EnergySupply("Coffee", 1), 2);
+
+        Thread energyGainer = new Thread(() -> {
+            while (true) {
+                if (energy < getMaxEnergy()) {
+                    try {
+                        TimeUnit.MINUTES.sleep(1);
+                        System.out.println(displayName + " restored 1 energy.");
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    energy++;
+                } else {
+                    try {
+                        TimeUnit.SECONDS.sleep(5);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+        energyGainer.start();
     }
 
     public long getId() {
