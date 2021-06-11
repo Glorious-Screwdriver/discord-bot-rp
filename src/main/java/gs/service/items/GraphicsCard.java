@@ -3,7 +3,8 @@ package gs.service.items;
 public class GraphicsCard extends Item {
     private final int efficiency;
 
-    public GraphicsCard(String name, int price, int requiredLevel, int efficiency) {
+    public GraphicsCard(String type, String name, int price, int requiredLevel, int efficiency) {
+        this.type = type;
         this.name = name;
         this.price = price;
         this.requiredLevel = requiredLevel;

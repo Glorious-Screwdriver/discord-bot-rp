@@ -1,10 +1,15 @@
 package gs.service.items;
 
 public class Item implements Comparable<Item> {
+    protected String type;
     protected String name;
     protected String description;
     protected int price;
     protected int requiredLevel;
+
+    public String getType() {
+        return type;
+    }
 
     public String getName() {
         return name;

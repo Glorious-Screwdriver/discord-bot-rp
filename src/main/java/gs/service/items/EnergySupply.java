@@ -3,7 +3,8 @@ package gs.service.items;
 public class EnergySupply extends Item {
     private final int providedEnergy;
 
-    public EnergySupply(String name, int price, int requiredLevel, int providedEnergy) {
+    public EnergySupply(String type, String name, int price, int requiredLevel, int providedEnergy) {
+        this.type = type;
         this.name = name;
         this.price = price;
         this.requiredLevel = requiredLevel;
