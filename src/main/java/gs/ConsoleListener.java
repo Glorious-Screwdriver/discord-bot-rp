@@ -188,17 +188,23 @@ public class ConsoleListener implements MessageCreateListener {
                 .setColor(Color.BLUE);
 
         List<Item> shop = shop();
-        player.inventory.forEach((key, value) -> {
-            String name = null;
-            for (Item item : shop) {
-                if (item.getType().equals(key)) {
-                    name = item.getName();
-                    break;
+        final int[] itemCounter = {1};
+
+        if (player.inventory.size() > 0) {
+            player.inventory.forEach((key, value) -> {
+                String name = null;
+                for (Item item : shop) {
+                    if (item.getType().equals(key)) {
+                        name = item.getName();
+                        break;
+                    }
                 }
-            }
-            if (name == null) throw new IllegalStateException("Name is null");
-            embedBuilder.addField(name, String.valueOf(value));
-        });
+                if (name == null) throw new IllegalStateException("Name is null");
+                embedBuilder.addField(itemCounter[0]++ + ". " + name, String.valueOf(value));
+            });
+        } else {
+            embedBuilder.setFooter("Wow, there's nothing...");
+        }
 
         new MessageBuilder().setEmbed(embedBuilder).send(channel);
     }
@@ -210,12 +216,13 @@ public class ConsoleListener implements MessageCreateListener {
                 .setColor(Color.GREEN);
 
         List<Item> shop = shop();
+        int itemCounter = 1;
 
         for (Item product : shop) {
             if (product.getClass() == EnergySupply.class) {
                 EnergySupply energySupply = (EnergySupply) product;
                 embedBuilder.addField(
-                        energySupply.getName(),
+                        itemCounter++ + ". " + energySupply.getName(),
                         energySupply.getDescription() + "\n" +
                                 "Price: " + energySupply.getPrice() + "\n" +
                                 "Required level: " + energySupply.getRequiredLevel() + "\n" +
