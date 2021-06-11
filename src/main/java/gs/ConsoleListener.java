@@ -65,8 +65,8 @@ public class ConsoleListener implements MessageCreateListener {
                 switch (type) {
                     case "coffee":
                         player.updateEnergy(1);
-                        dataBase.increment(player.getId(), "energy", 1);
-                        dataBase.increment(player.getId(), "coffee", -1);
+                        player.statistics.updateCoffeeConsumed(1);
+                        dataBase.updatePlayer(player);
                         channel.sendMessage(String.format(
                                 "You have drank a cup of coffee! Energy: %d/%d",
                                 player.getEnergy(),
@@ -75,8 +75,8 @@ public class ConsoleListener implements MessageCreateListener {
                         break;
                     case "energy_drink":
                         player.updateEnergy(2);
-                        dataBase.increment(player.getId(), "energy", 2);
-                        dataBase.increment(player.getId(), "coffee", -1);
+                        player.statistics.updateEnergyDrinksConsumed(1);
+                        dataBase.updatePlayer(player);
                         channel.sendMessage(String.format(
                                 "You have consumed a can of energy drink! Energy: %d/%d",
                                 player.getEnergy(),
@@ -96,9 +96,8 @@ public class ConsoleListener implements MessageCreateListener {
                         }
                         if (card == null) throw new IllegalStateException("Card is null");
                         boolean added = player.farm.addCard(card);
+                        dataBase.updatePlayer(player);
                         if (added) {
-                            dataBase.increment(player.getId(), card.getType(), -1);
-                            dataBase.increment(player.getId(), card.getType()+"_installed", 1);
                             channel.sendMessage(String.format(
                                     "You have installed %s in your mining farm.",
                                     card.getName()
@@ -168,10 +167,12 @@ public class ConsoleListener implements MessageCreateListener {
 
                 MessageBuilder messageBuilder = new MessageBuilder();
                 if (solved) {
+                    player.statistics.updateCasesDone(1);
                     messageBuilder.append("Answer is correct! You have gained: " + activeCase.getProfit());
                 } else {
                     messageBuilder.append("Answer is wrong. Try again or type in \"new\" to get another case");
                 }
+                dataBase.updatePlayer(player);
 
                 messageBuilder
                         .appendNewLine()
@@ -216,8 +217,8 @@ public class ConsoleListener implements MessageCreateListener {
                     }
 
                     player.updateMoney(-item.getPrice());
-                    dataBase.increment(player.getId(), item.getType(), 1);
-                    dataBase.increment(player.getId(), "money", -item.getPrice());
+                    player.statistics.updatemoneySpent(item.getPrice());
+                    dataBase.updatePlayer(player);
                     channel.sendMessage(String.format(
                             "You have purchased %s!\nMoney left: %d",
                             item.getName(),
@@ -255,15 +256,13 @@ public class ConsoleListener implements MessageCreateListener {
 
                 // Removing card
                 player.farm.removeCard(card);
-                dataBase.increment(player.getId(), card.getType()+"_installed", -1);
-                dataBase.increment(player.getId(), card.getType(), 1);
                 if (player.inventory.containsKey(card.getType())) {
                     player.inventory.replace(card.getType(), player.inventory.get(card.getType()) + 1);
                 } else {
                     player.inventory.put(card.getType(), 1);
                 }
                 channel.sendMessage("Graphics card was successfully uninstalled.");
-
+                dataBase.updatePlayer(player);
                 return;
             } else if (msg.equalsIgnoreCase("help")) {
                 sendEnvironmentHelp("farm-help.txt");
@@ -288,7 +287,7 @@ public class ConsoleListener implements MessageCreateListener {
             consoleState = ConsoleState.FARM;
             drawFarm();
         } else if (msg.equalsIgnoreCase("achievements")) {
-//            consoleState = ConsoleState.ACHIEVEMENTS;
+            consoleState = ConsoleState.ACHIEVEMENTS;
             drawAchievements();
         } else if (msg.equalsIgnoreCase("quit")) {
             channel.sendMessage("Closing console...");

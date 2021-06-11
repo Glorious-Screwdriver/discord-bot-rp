@@ -12,7 +12,7 @@ CREATE TABLE `discordbot`.`players` (
   `graphics_card_1_installed` INT NOT NULL,
   `graphics_card_2_installed` INT NOT NULL,
   `graphics_card_3_installed` INT NOT NULL,
-  `acquired_money` INT NOT NULL,
+  `money_spent` INT NOT NULL,
   `cases_done` INT NOT NULL,
   `coffee_consumed` INT NOT NULL,
   `energy_drinks_consumed` INT NOT NULL,

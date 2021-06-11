@@ -20,7 +20,6 @@ public class GraphicsCard extends Item {
                 this.price = 300;
                 this.requiredLevel = 1;
                 this.efficiency = 10;
-                System.out.println("graphics_card_1");
                 break;
             case "graphics_card_2":
                 this.type = "graphics_card_2";
