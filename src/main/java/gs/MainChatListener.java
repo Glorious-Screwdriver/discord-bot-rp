@@ -88,6 +88,12 @@ public class MainChatListener implements MessageCreateListener {
             console.drawHomeScreen();
 
         } else if (msg.equalsIgnoreCase("!clear")) {
+            if (!event.getMessageAuthor().canManageRolesOnServer()) {
+                event.getChannel().sendMessage("You don't have enough permissions " +
+                        "to execute this command.");
+                return;
+            }
+
             Server server = event.getServer()
                     .orElseThrow(() -> new RuntimeException("Server is not present"));
 

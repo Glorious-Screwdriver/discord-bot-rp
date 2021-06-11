@@ -1,5 +1,7 @@
 package gs;
 
+import gs.service.achievements.Achievement;
+import gs.service.achievements.Achievements;
 import gs.service.cases.Case;
 import gs.service.cases.OptionCase;
 import gs.service.cases.StringCase;
@@ -43,6 +45,7 @@ public class ConsoleListener implements MessageCreateListener {
         if (event.getMessageAuthor().isYourself()) return;
 
         // CONSOLE STATE CHECK
+
         if (consoleState == ConsoleState.INVENTORY) {
             if (msg.toLowerCase().contains("use")) {
                 // Getting item number
@@ -133,6 +136,7 @@ public class ConsoleListener implements MessageCreateListener {
                     return;
                 }
 
+                // Getting answer
                 String content = msg
                         .toLowerCase()
                         .replace("solve", "")
@@ -143,6 +147,7 @@ public class ConsoleListener implements MessageCreateListener {
                     return;
                 }
 
+                // Solving case
                 boolean solved = false;
                 Case activeCase = player.getActiveCase();
                 if (activeCase.getClass() == OptionCase.class) {
@@ -254,7 +259,7 @@ public class ConsoleListener implements MessageCreateListener {
                     return;
                 }
 
-                // Removing card
+                // Uninstalling card
                 player.farm.removeCard(card);
                 if (player.inventory.containsKey(card.getType())) {
                     player.inventory.replace(card.getType(), player.inventory.get(card.getType()) + 1);
@@ -270,7 +275,8 @@ public class ConsoleListener implements MessageCreateListener {
             }
         }
 
-        // SWITCH ENVIRONMENT COMMANDS, HELP, QUIT
+        // SWITCH ENVIRONMENT COMMANDS, GLOBAL HELP, QUIT
+
         if (msg.equalsIgnoreCase("home")) {
             consoleState = ConsoleState.HOME;
             drawHome();
@@ -297,11 +303,13 @@ public class ConsoleListener implements MessageCreateListener {
             active.remove(player);
             System.out.println("Player disconnected. Active players now: " + active.toString());
         } else if (msg.equalsIgnoreCase("help")) {
-            sendHomeHelp();
+            sendEnvironmentHelp("CL-help.txt");
         } else {
             channel.sendMessage("Undefined command. For more information type in \"help\".");
         }
     }
+
+    // ENVIRONMENT DRAWING
 
     private void drawHome() {
         new MessageBuilder()
@@ -479,13 +487,68 @@ public class ConsoleListener implements MessageCreateListener {
     }
 
     private void drawAchievements() {
-        channel.sendMessage("ACHIEVEMENTS environment is not supported yet!");
+        EmbedBuilder embedBuilder = new EmbedBuilder()
+                .setTitle("ACHIEVEMENTS")
+                .setDescription("All the goals you have reached.")
+                .setColor(Color.YELLOW);
+
+        int achievementCounter = 0;
+
+        List<Achievement> achievements = Achievements.calculate(player);
+        System.out.println();
+        for (Achievement achievement : achievements) {
+
+            if (achievement.getLevel() != null) {
+                String achievementName = achievement.getName();
+                switch (achievementName) {
+                    case "Spender":
+                        embedBuilder.addField(
+                                achievementName + ", level " + achievement.getLevel(),
+                                achievement.getDescription() + "\n" +
+                                        "Money spent: " + player.statistics.getMoneySpent());
+                        break;
+                    case "Worker":
+                        embedBuilder.addField(
+                                achievementName + ", level " + achievement.getLevel(),
+                                achievement.getDescription() + "\n" +
+                                        "Cases done: " + player.statistics.getCasesDone());
+                        break;
+                    case "Coffee enjoyer":
+                        embedBuilder.addField(
+                                achievementName + ", level " + achievement.getLevel(),
+                                achievement.getDescription() + "\n" +
+                                        "Coffee consumed: " + player.statistics.getCoffeeConsumed());
+                        break;
+                    case "Energizer":
+                        embedBuilder.addField(
+                                achievementName + ", level " + achievement.getLevel(),
+                                achievement.getDescription() + "\n" +
+                                        "Energy drinks consumed: " + player.statistics.getCasesDone());
+                        break;
+                }
+                achievementCounter++;
+            }
+        }
+
+        if (achievementCounter == 0) {
+            embedBuilder.setFooter("Not a single one yet :D");
+        }
+
+        new MessageBuilder().setEmbed(embedBuilder).send(channel);
     }
 
     public void drawHomeScreen() {
         drawHome();
     }
 
+    /**
+     * Gets a number of selected item.
+     *
+     * @param msg      Original message from player
+     * @param word     String that is deleted from file. Usually is the command text
+     * @param helpFile A path to the help file, that fits the environment
+     * @return Number of selected item
+     */
     private Integer getItemNumber(String msg, String word, String helpFile) {
         String content = msg
                 .replace(word, "")
@@ -500,10 +563,6 @@ public class ConsoleListener implements MessageCreateListener {
             return null;
         }
         return itemNumber;
-    }
-
-    private void sendHomeHelp() {
-        channel.sendMessage(getHelpString("CL-help.txt"));
     }
 
     private void sendEnvironmentHelp(String file) {
