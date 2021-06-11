@@ -1,5 +1,5 @@
 CREATE TABLE `discordbot`.`players` (
-  `id` INT UNIQUE NOT NULL,
+  `id` BIGINT UNIQUE NOT NULL,
   `name` VARCHAR(45) NOT NULL,
   `level` INT NOT NULL,
   `money` INT NOT NULL,

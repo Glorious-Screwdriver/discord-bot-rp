@@ -9,8 +9,20 @@ public class Player {
     private int level;
     private int money;
     private int energy;
-    public Map<String, Integer> inventory;
-    PlayerStatistics statistics;
+    public LinkedHashMap <String, Integer> inventory;
+    public PlayerStatistics statistics;
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    public void setMoney(int money) {
+        this.money = money;
+    }
+
+    public void setEnergy(int energy) {
+        this.energy = energy;
+    }
 
     public Player(long id, String displayName, String discriminator) {
         this.id = id;
@@ -20,6 +32,7 @@ public class Player {
         this.money = 200;
         this.energy = 5;
         this.inventory = new LinkedHashMap<>();
+        this.statistics = new PlayerStatistics(0,0,0,0);
 
 //        inventory.put(new EnergySupply("Coffee", 1), 2);
     }

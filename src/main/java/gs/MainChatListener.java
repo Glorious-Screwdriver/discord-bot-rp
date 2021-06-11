@@ -22,8 +22,9 @@ import java.util.List;
 public class MainChatListener implements MessageCreateListener {
     DiscordApi api;
     List<Player> active;
-
+    DataBase dataBase;
     public MainChatListener(DiscordApi api, List<Player> active) {
+        dataBase = new DataBase();
         this.api = api;
         this.active = active;
     }
@@ -78,7 +79,7 @@ public class MainChatListener implements MessageCreateListener {
                     author.getDisplayName(),
                     discriminator
             );
-            active.add(player);
+            active.add(dataBase.getPlayer(player));
             System.out.println("New player arrived. Active players now: " + active.toString());
 
             ConsoleListener console = new ConsoleListener(active, player, channel);
