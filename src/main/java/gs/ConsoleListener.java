@@ -1,5 +1,8 @@
 package gs;
 
+import gs.service.Case;
+import gs.service.OptionCase;
+import gs.service.StringCase;
 import gs.service.items.EnergySupply;
 import gs.service.items.GraphicsCard;
 import gs.service.items.Item;
@@ -207,7 +210,7 @@ public class ConsoleListener implements MessageCreateListener {
             consoleState = ConsoleState.HOME;
             drawHome();
         } else if (msg.equalsIgnoreCase("case")) {
-//            consoleState = ConsoleState.CASE;
+            consoleState = ConsoleState.CASE;
             drawCase();
         } else if (msg.equalsIgnoreCase("inventory")) {
             consoleState = ConsoleState.INVENTORY;
@@ -248,7 +251,88 @@ public class ConsoleListener implements MessageCreateListener {
     }
 
     private void drawCase() {
-        channel.sendMessage("CASE environment is not supported yet!");
+        Case aCase;
+
+        // If a player has an active case, opens it
+        // otherwise getting new one from the base
+        if (player.getActiveCase() != null) {
+            aCase = player.getActiveCase();
+        } else {
+            List<Case> cases = new ArrayList<>();
+
+            // OPTION CASES
+
+            Path optionCasesPath = Paths.get("src/main/java/gs/materials/option-cases.txt");
+
+            List<String> optionCasesLines;
+            try {
+                optionCasesLines = Files.readAllLines(optionCasesPath);
+            } catch (IOException e) {
+                throw new IllegalStateException("No cases file", e);
+            }
+
+            for (String line : optionCasesLines) {
+                String[] elements = line.split(";");
+                String[] options = elements[4].split(",");
+                cases.add(new OptionCase(
+                        elements[0], // String name
+                        elements[1], // String description
+                        Integer.parseInt(elements[2]), // int profit
+                        Integer.parseInt(elements[3]), // int experience
+                        Arrays.asList(options), // List<String> options
+                        Integer.parseInt(elements[5])) // int answer
+                );
+            }
+
+            // STRING CASES
+
+            Path stringCasesPath = Paths.get("src/main/java/gs/materials/string-cases.txt");
+
+            List<String> stringCasesLines;
+            try {
+                stringCasesLines = Files.readAllLines(stringCasesPath);
+            } catch (IOException e) {
+                throw new IllegalStateException("No cases file", e);
+            }
+
+            for (String line : stringCasesLines) {
+                String[] elements = line.split(";");
+                cases.add(new StringCase(
+                        elements[0], // String name
+                        elements[1], // String description
+                        Integer.parseInt(elements[2]), // int profit
+                        Integer.parseInt(elements[3]), // int experience
+                        elements[4]) // String answer
+                );
+            }
+
+            Random random = new Random();
+            aCase = cases.get(random.nextInt(cases.size()));
+            aCase.assignToPlayer(player);
+        }
+
+        // PRINTING CASE
+
+        EmbedBuilder embedBuilder = new EmbedBuilder()
+                .setTitle(aCase.getName())
+                .setDescription(aCase.getDescription() + "\n" +
+                        "Profit: " + aCase.getProfit())
+                .setColor(Color.RED);
+
+        Class<? extends Case> caseClass = aCase.getClass();
+        if (caseClass == OptionCase.class) {
+            OptionCase optionCase = (OptionCase) aCase;
+            List<String> options = optionCase.getOptions();
+            int optionNum = 1;
+            for (String option : options) {
+                embedBuilder.addField(option, "Option " + optionNum++);
+            }
+            embedBuilder.setFooter("To send an answer, type in \"solve <option number>\"");
+        } else if (caseClass == StringCase.class) {
+            embedBuilder.setFooter("To send an answer, type in \"solve <your answer>\"");
+        }
+
+        new MessageBuilder().setEmbed(embedBuilder).send(channel);
     }
 
     private void drawInventory() {

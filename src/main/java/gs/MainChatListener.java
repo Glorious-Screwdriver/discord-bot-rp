@@ -23,6 +23,7 @@ public class MainChatListener implements MessageCreateListener {
     DiscordApi api;
     List<Player> active;
     DataBase dataBase;
+
     public MainChatListener(DiscordApi api, List<Player> active) {
         dataBase = new DataBase();
         this.api = api;
