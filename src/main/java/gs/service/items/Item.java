@@ -1,6 +1,6 @@
 package gs.service.items;
 
-public class Item implements Comparable<Item> {
+public abstract class Item {
     protected String type;
     protected String name;
     protected String description;
@@ -25,10 +25,5 @@ public class Item implements Comparable<Item> {
 
     public int getRequiredLevel() {
         return requiredLevel;
-    }
-
-    @Override
-    public int compareTo(Item o) {
-        return name.compareTo(o.getName());
     }
 }

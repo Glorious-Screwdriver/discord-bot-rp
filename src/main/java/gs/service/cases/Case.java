@@ -1,6 +1,8 @@
-package gs.service;
+package gs.service.cases;
 
-public class Case {
+import gs.service.Player;
+
+public abstract class Case {
     protected String name;
     protected String description;
     protected int profit;

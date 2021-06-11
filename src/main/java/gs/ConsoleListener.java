@@ -1,8 +1,8 @@
 package gs;
 
-import gs.service.Case;
-import gs.service.OptionCase;
-import gs.service.StringCase;
+import gs.service.cases.Case;
+import gs.service.cases.OptionCase;
+import gs.service.cases.StringCase;
 import gs.service.items.EnergySupply;
 import gs.service.items.GraphicsCard;
 import gs.service.items.Item;
@@ -527,10 +527,10 @@ public class ConsoleListener implements MessageCreateListener {
     private List<Item> shop() {
         return Arrays.asList(
                 new EnergySupply("coffee", "Coffee", 50, 1, 1),
-                new EnergySupply("energy_drink", "Energy drink", 80, 2, 2),
-                new GraphicsCard("graphics_card_1", "GTX 680", 300, 1, 10),
-                new GraphicsCard("graphics_card_2", "GTX 970", 1000, 3, 100),
-                new GraphicsCard("graphics_card_3", "Titan Z", 5000, 5, 500)
+                new EnergySupply("energy_drink", "Energy drink", 80, 10, 2),
+                new GraphicsCard("graphics_card_1", "GTX 680", 300, 2, 10),
+                new GraphicsCard("graphics_card_2", "GTX 970", 1000, 10, 100),
+                new GraphicsCard("graphics_card_3", "Titan Z", 5000, 30, 500)
         );
     }
 }

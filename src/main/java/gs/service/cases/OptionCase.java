@@ -1,4 +1,4 @@
-package gs.service;
+package gs.service.cases;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package gs.service;
+package gs.service.cases;
 
 public class StringCase extends Case {
     private final String answer;
