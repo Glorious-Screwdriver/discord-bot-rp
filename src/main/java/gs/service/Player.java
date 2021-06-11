@@ -11,6 +11,7 @@ public class Player {
     private int energy;
     public LinkedHashMap <String, Integer> inventory;
     public PlayerStatistics statistics;
+    public Farm farm;
 
     public void setLevel(int level) {
         this.level = level;
@@ -29,11 +30,14 @@ public class Player {
         this.displayName = displayName;
         this.discriminator = discriminator;
         this.level = 1;
-        this.money = 200;
+        this.money = 300;
         this.energy = 5;
+
         this.inventory = new LinkedHashMap<>();
         this.statistics = new PlayerStatistics(0,0,0,0);
 
+        this.farm = new Farm(this);
+        this.statistics = new PlayerStatistics();
 //        inventory.put(new EnergySupply("Coffee", 1), 2);
     }
 

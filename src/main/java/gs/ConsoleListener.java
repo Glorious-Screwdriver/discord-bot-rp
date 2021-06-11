@@ -1,7 +1,8 @@
 package gs;
 
-import gs.service.EnergySupply;
-import gs.service.Item;
+import gs.service.items.EnergySupply;
+import gs.service.items.GraphicsCard;
+import gs.service.items.Item;
 import gs.service.Player;
 import gs.util.ConsoleState;
 import org.javacord.api.entity.channel.TextChannel;
@@ -46,9 +47,9 @@ public class ConsoleListener implements MessageCreateListener {
                 // Getting item name
                 List<Map.Entry<String, Integer>> list = new ArrayList<>(player.inventory.entrySet());
 
-                String item;
+                String type;
                 try {
-                    item = list.get(itemNumber - 1).getKey();
+                    type = list.get(itemNumber - 1).getKey();
                 } catch (IndexOutOfBoundsException e) {
                     e.printStackTrace();
                     channel.sendMessage("Wrong number!");
@@ -56,27 +57,51 @@ public class ConsoleListener implements MessageCreateListener {
                 }
 
                 // Interpreting item effect
-                if (item.equals("Coffee")) {
+                if (type.equals("coffee")) {
                     player.updateEnergy(1);
                     channel.sendMessage(String.format(
                             "You have drank a cup of coffee! Energy: %d/%d",
                             player.getEnergy(),
                             player.getMaxEnergy()
                     ));
-                } else if (item.equals("Energy drink")) {
+                } else if (type.equals("energy_drink")) {
                     player.updateEnergy(2);
                     channel.sendMessage(String.format(
                             "You have consumed a can of energy drink! Energy: %d/%d",
                             player.getEnergy(),
                             player.getMaxEnergy()
                     ));
+                } else if (type.equals("graphics_card_1")) {
+                    player.farm.addCard(new GraphicsCard(
+                            "graphics_card_1",
+                            "GTX 680",
+                            300,
+                            2,
+                            10));
+                    channel.sendMessage("You have installed GTX 680 in your mining farm.");
+                } else if (type.equals("graphics_card_2")) {
+                    player.farm.addCard(new GraphicsCard(
+                            "graphics_card_2",
+                            "GTX 970",
+                            1000,
+                            3,
+                            100));
+                    channel.sendMessage("You have installed GTX 970 in your mining farm.");
+                } else if (type.equals("graphics_card_3")) {
+                    player.farm.addCard(new GraphicsCard(
+                            "graphics_card_3",
+                            "Titan Z",
+                            5000,
+                            5,
+                            500));
+                    channel.sendMessage("You have installed Titan Z in your mining farm.");
                 }
 
                 // Deleting item from inventory
-                if (player.inventory.get(item) == 1) {
-                    player.inventory.remove(item);
+                if (player.inventory.get(type) == 1) {
+                    player.inventory.remove(type);
                 } else {
-                    player.inventory.replace(item, player.inventory.get(item) - 1);
+                    player.inventory.replace(type, player.inventory.get(type) - 1);
                 }
 
                 return;
@@ -104,12 +129,12 @@ public class ConsoleListener implements MessageCreateListener {
 
                 // Purchasing
                 if (player.getMoney() >= item.getPrice() && player.getLevel() >= item.getRequiredLevel()) {
-                    String name = item.getName();
+                    String type = item.getType();
 
-                    if (player.inventory.containsKey(name)) {
-                        player.inventory.replace(name, player.inventory.get(name) + 1);
+                    if (player.inventory.containsKey(type)) {
+                        player.inventory.replace(type, player.inventory.get(type) + 1);
                     } else {
-                        player.inventory.put(name, 1);
+                        player.inventory.put(type, 1);
                     }
 
                     player.updateMoney(-item.getPrice());
@@ -186,7 +211,24 @@ public class ConsoleListener implements MessageCreateListener {
                 .setDescription("These are the things you own.")
                 .setColor(Color.BLUE);
 
-        player.inventory.forEach((key, value) -> embedBuilder.addField(key, String.valueOf(value)));
+        List<Item> shop = shop();
+
+        final int[] itemCounter = {1};
+        if (player.inventory.size() > 0) {
+            player.inventory.forEach((key, value) -> {
+                String name = null;
+                for (Item item : shop) {
+                    if (item.getType().equals(key)) {
+                        name = item.getName();
+                        break;
+                    }
+                }
+                if (name == null) throw new IllegalStateException("Name is null");
+                embedBuilder.addField(itemCounter[0]++ + ". " + name, String.valueOf(value));
+            });
+        } else {
+            embedBuilder.setFooter("Wow, there's nothing...");
+        }
 
         new MessageBuilder().setEmbed(embedBuilder).send(channel);
     }
@@ -198,16 +240,26 @@ public class ConsoleListener implements MessageCreateListener {
                 .setColor(Color.GREEN);
 
         List<Item> shop = shop();
+        int itemCounter = 1;
 
         for (Item product : shop) {
             if (product.getClass() == EnergySupply.class) {
                 EnergySupply energySupply = (EnergySupply) product;
                 embedBuilder.addField(
-                        energySupply.getName(),
+                        itemCounter++ + ". " + energySupply.getName(),
                         energySupply.getDescription() + "\n" +
                                 "Price: " + energySupply.getPrice() + "\n" +
                                 "Required level: " + energySupply.getRequiredLevel() + "\n" +
                                 "Energy: " + energySupply.getProvidedEnergy()
+                );
+            } else if (product.getClass() == GraphicsCard.class) {
+                GraphicsCard card = (GraphicsCard) product;
+                embedBuilder.addField(
+                        itemCounter++ + ". " + card.getName(),
+                        card.getDescription() + "\n" +
+                                "Price: " + card.getPrice() + "\n" +
+                                "Required level: " + card.getRequiredLevel() + "\n" +
+                                "Efficiency: " + card.getEfficiency()
                 );
             }
         }
@@ -263,9 +315,11 @@ public class ConsoleListener implements MessageCreateListener {
 
     private List<Item> shop() {
         return Arrays.asList(
-                new EnergySupply("Coffee", 50, 1, 1),
-                new EnergySupply("Energy drink", 80, 2, 2)
-                //TODO add graphics cards
+                new EnergySupply("coffee", "Coffee", 50, 1, 1),
+                new EnergySupply("energy_drink", "Energy drink", 80, 2, 2),
+                new GraphicsCard("graphics_card_1", "GTX 680", 300, 2, 10),
+                new GraphicsCard("graphics_card_2", "GTX 970", 1000, 3, 100),
+                new GraphicsCard("graphics_card_3", "Titan Z", 5000, 5, 500)
         );
     }
 }
