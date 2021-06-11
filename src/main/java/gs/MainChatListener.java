@@ -78,7 +78,8 @@ public class MainChatListener implements MessageCreateListener {
             Player player = new Player(
                     author.getId(),
                     author.getDisplayName(),
-                    discriminator
+                    discriminator,
+                    dataBase
             );
             active.add(dataBase.getPlayer(player));
             System.out.println("New player arrived. Active players now: " + active.toString());

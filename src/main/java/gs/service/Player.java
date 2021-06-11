@@ -1,5 +1,6 @@
 package gs.service;
 
+import gs.DataBase;
 import gs.service.cases.Case;
 
 import java.util.*;
@@ -12,19 +13,21 @@ public class Player {
     private int level;
     private int money;
     private int energy;
+    private DataBase dataBase;
 
     public LinkedHashMap <String, Integer> inventory;
     public PlayerStatistics statistics;
     public Farm farm;
     private Case activeCase;
 
-    public Player(long id, String displayName, String discriminator) {
+    public Player(long id, String displayName, String discriminator, DataBase dataBase) {
         this.id = id;
         this.displayName = displayName;
         this.discriminator = discriminator;
         this.level = 1;
         this.money = 300;
         this.energy = 5;
+        this.dataBase = dataBase;
 
         this.inventory = new LinkedHashMap<>();
         this.statistics = new PlayerStatistics();
@@ -90,11 +93,13 @@ public class Player {
     }
 
     public void updateMoney(int x) {
+        dataBase.updatePlayer(this);
         money += x;
     }
 
     public void updateEnergy(int x) {
         energy += x;
+        dataBase.updatePlayer(this);
     }
 
     public void setLevel(int level) {
