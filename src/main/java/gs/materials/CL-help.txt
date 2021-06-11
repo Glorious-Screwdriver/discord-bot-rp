@@ -1,5 +1,6 @@
 --- Help ---
 home - information about player
+case - solving problems, gaining cash
 inventory - list of your items
 shop - buying items
 farm - managing graphics cards

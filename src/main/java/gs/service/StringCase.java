@@ -3,13 +3,12 @@ package gs.service;
 public class StringCase extends Case {
     private final String answer;
 
-    public StringCase(String name, String description, int profit, int exp, String answer) {
+    public StringCase(String name, String description, int profit, String answer) {
 
         // those are read from file
         this.name = name;
         this.description = description;
         this.profit = profit;
-        this.exp = exp;
         this.answer = answer;
     }
 

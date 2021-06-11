@@ -113,6 +113,72 @@ public class ConsoleListener implements MessageCreateListener {
                 sendEnvironmentHelp("inventory-help.txt");
                 return;
             }
+        } else if (consoleState == ConsoleState.CASE) {
+            if (msg.toLowerCase().contains("solve")) {
+                if (player.getActiveCase() == null) {
+                    channel.sendMessage("You have no cases opened. Type in \"case\" to get one.");
+                    return;
+                }
+
+                if (player.getEnergy() <= 0) {
+                    channel.sendMessage("Your energy is down. " +
+                            "Drink some coffee or wait to restore it.");
+                    return;
+                }
+
+                String content = msg
+                        .toLowerCase()
+                        .replace("solve", "")
+                        .replace(" ", "");
+
+                if (content.equals("")) {
+                    sendEnvironmentHelp("case-help.txt");
+                    return;
+                }
+
+                boolean solved = false;
+                Case activeCase = player.getActiveCase();
+                if (activeCase.getClass() == OptionCase.class) {
+                    int answer;
+                    try {
+                        answer = Integer.parseInt(content);
+                    } catch (NumberFormatException e) {
+                        e.printStackTrace();
+                        channel.sendMessage("Wrong number format!");
+                        return;
+                    }
+
+                    OptionCase optionCase = (OptionCase) activeCase;
+                    solved = optionCase.solve(answer);
+
+                } else if (activeCase.getClass() == StringCase.class) {
+                    StringCase stringCase = (StringCase) activeCase;
+                    solved = stringCase.solve(content);
+                }
+
+                player.updateEnergy(-1);
+
+                MessageBuilder messageBuilder = new MessageBuilder();
+                if (solved) {
+                    messageBuilder.append("Answer is correct! You have gained: " + activeCase.getProfit());
+                } else {
+                    messageBuilder.append("Answer is wrong. Try again or type in \"new\" to get another case");
+                }
+
+                messageBuilder
+                        .appendNewLine()
+                        .append("Energy left: " + player.getEnergy())
+                        .send(channel);
+
+                return;
+            } else if (msg.equalsIgnoreCase("new")) {
+                player.clearCase();
+                drawCase();
+                return;
+            } else if (msg.equalsIgnoreCase("help")) {
+                sendEnvironmentHelp("case-help.txt");
+                return;
+            }
 
         } else if (consoleState == ConsoleState.SHOP) {
             if (msg.toLowerCase().contains("buy")) {
@@ -261,14 +327,13 @@ public class ConsoleListener implements MessageCreateListener {
 
             for (String line : optionCasesLines) {
                 String[] elements = line.split(";");
-                String[] options = elements[4].split(",");
+                String[] options = elements[3].split(",");
                 cases.add(new OptionCase(
                         elements[0], // String name
                         elements[1], // String description
                         Integer.parseInt(elements[2]), // int profit
-                        Integer.parseInt(elements[3]), // int experience
                         Arrays.asList(options), // List<String> options
-                        Integer.parseInt(elements[5])) // int answer
+                        Integer.parseInt(elements[4])) // int answer
                 );
             }
 
@@ -289,8 +354,7 @@ public class ConsoleListener implements MessageCreateListener {
                         elements[0], // String name
                         elements[1], // String description
                         Integer.parseInt(elements[2]), // int profit
-                        Integer.parseInt(elements[3]), // int experience
-                        elements[4]) // String answer
+                        elements[3].toLowerCase()) // String answer
                 );
             }
 
@@ -313,7 +377,7 @@ public class ConsoleListener implements MessageCreateListener {
             List<String> options = optionCase.getOptions();
             int optionNum = 1;
             for (String option : options) {
-                embedBuilder.addField(option, "Option " + optionNum++);
+                embedBuilder.addField("Option " + optionNum++, option);
             }
             embedBuilder.setFooter("To send an answer, type in \"solve <option number>\"");
         } else if (caseClass == StringCase.class) {

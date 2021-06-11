@@ -4,7 +4,6 @@ public class Case {
     protected String name;
     protected String description;
     protected int profit;
-    protected int exp;
 //    protected int requiredLevel;
 
     protected Player player;
@@ -31,8 +30,7 @@ public class Case {
 
     public void finish() {
         player.updateMoney(profit);
-        player.updateEnergy(-1);
-        player.updateLevel(exp);
+        player.updateLevel(1);
         player.clearCase();
     }
 }

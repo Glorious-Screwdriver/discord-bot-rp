@@ -1,2 +1,2 @@
-Variable availability;What kind of availability modificator in Java allows other classes to use this variable from anywhere?;50;5;public
-Name;Description;500;100;Answer
+Variable availability;What kind of availability modificator in Java allows other classes to use this variable from anywhere?;50;public
+Name;Description;500;Answer

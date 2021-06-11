@@ -1,2 +1,2 @@
-Hello world;What Java command will print a simple "Hello world!" string in console?;100;10;print("Hello World!"),System.out.println("Hello World!"),println("Hello World!");2
-Name;Description;300;50;Option 1 (right answer),Option 2,Option 3;1
+Hello world;What Java command will print a simple "Hello world!" string in console?;100;print("Hello World!"),System.out.println("Hello World!"),println("Hello World!");2
+Name;Description;300;Option 1 (right answer),Option 2,Option 3;1
