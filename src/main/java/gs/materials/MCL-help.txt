@@ -1,0 +1,2 @@
+!console - open console
+!clear - close all opened consoles and delete all players from active

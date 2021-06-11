@@ -1,0 +1,10 @@
+Variable availability;What kind of availability modificator in Java allows other classes to use this variable from anywhere?;50;public
+Comparing values;Which operator can be used to compare two values?;200;==
+Array indexes;Array indexes start with:;200;0
+Creating class;Which keyword is used to create a class in Java?;300;class
+Importing packages;Which keyword is used to import a package from the Java API library?;300;import
+Empty method;How do you call a method, that doesn't return any value?;300;void
+Stopping the loop;What command should you use to quit the loop?;400;break
+Exception challenge;What exception will be thrown, if user tries to reach array element by id that is out of it's border?;1000;IndexOutOfBoundsException
+Principles of programming;What are 5 principles that were introduced by Robert Martin? (Type in first letter of those 5 principles);500;SOLID
+Collection;What collection stores data in keys and values?;500;map

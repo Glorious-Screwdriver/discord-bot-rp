@@ -1,0 +1,3 @@
+--- Case ---
+solve <string answer/answer number>
+new

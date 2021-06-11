@@ -1,0 +1,10 @@
+Hello world;What Java command will print a simple "Hello world!" string in console?;100;print("Hello World!"),System.out.println("Hello World!"),println("Hello World!");2
+Array;How to setup an array in Java?;300;int[] array = new int[],new array = int[],int array[] = new int[];1
+Abstract class;Abstract class is a class that...;500;has no purpose.,is designed to provide basic functionality for inherited classes.,has only abstract methods.;2
+JavaScript;Java is short for "JavaScript"?;100;True,False;2
+Comments;How do you insert COMMENTS in Java code?;300;# this is a comment,* this is a comment,// this is a comment;3
+Text variable;Which data type is used to create a variable that should store text?;300;myString,String,Txt,string;2
+Number variable;How do you create a variable with the numeric value 5?;100;int x = 5,num x = 5,x = 5;1
+Length of a string;Which method can be used to find the length of a string?;500;length(),getSize(),len();1
+Summing values;Which operator is used to add together two values?;100;"+","&","*";1
+Upper case;Which method can be used to return a string in upper case letters?;500;tuc(),upperCase(),toUpperCase();3
