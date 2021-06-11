@@ -418,7 +418,7 @@ public class ConsoleListener implements MessageCreateListener {
                     }
                 }
                 if (name == null) throw new IllegalStateException("Name is null");
-                embedBuilder.addField(itemCounter[0]++ + ". " + name, String.valueOf(value));
+                embedBuilder.addField(itemCounter[0]++ + ". " + name, "Quantity: " + value);
             });
         } else {
             embedBuilder.setFooter("Wow, there's nothing...");
@@ -473,7 +473,8 @@ public class ConsoleListener implements MessageCreateListener {
                     itemCounter++ + ". " + card.getName(),
                     "Efficiency: " + card.getEfficiency());
         }
-        embedBuilder.setFooter("Average income per minute: " + player.farm.getIncome());
+        embedBuilder.setFooter("Average income per minute: " + player.farm.getIncome() + "\n" +
+                "Slots used: " + player.farm.cards.size() + "/" + player.farm.getLimit());
 
         new MessageBuilder().setEmbed(embedBuilder).send(channel);
     }

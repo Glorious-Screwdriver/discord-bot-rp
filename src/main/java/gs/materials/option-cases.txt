@@ -7,4 +7,4 @@ Text variable;Which data type is used to create a variable that should store tex
 Number variable;How do you create a variable with the numeric value 5?;100;int x = 5,num x = 5,x = 5;1
 Length of a string;Which method can be used to find the length of a string?;500;length(),getSize(),len();1
 Summing values;Which operator is used to add together two values?;100;"+","&","*";1
-Upper case;Which method can be used to return a string in upper case letters?;500;tuc(),upperCase(),toUpperCase(),3
+Upper case;Which method can be used to return a string in upper case letters?;500;tuc(),upperCase(),toUpperCase();3
