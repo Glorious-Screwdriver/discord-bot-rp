@@ -2,5 +2,6 @@
 home - information about player
 inventory - list of your items
 shop - buying items
+farm - managing graphics cards
 
 quit - exit the console

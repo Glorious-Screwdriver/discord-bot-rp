@@ -44,7 +44,7 @@ public class ConsoleListener implements MessageCreateListener {
                 Integer itemNumber = getItemNumber(msg, "use", "inventory-help.txt");
                 if (itemNumber == null) return;
 
-                // Getting item name
+                // Getting item type
                 List<Map.Entry<String, Integer>> list = new ArrayList<>(player.inventory.entrySet());
 
                 String type;
@@ -72,29 +72,44 @@ public class ConsoleListener implements MessageCreateListener {
                             player.getMaxEnergy()
                     ));
                 } else if (type.equals("graphics_card_1")) {
-                    player.farm.addCard(new GraphicsCard(
+                    boolean added = player.farm.addCard(new GraphicsCard(
                             "graphics_card_1",
                             "GTX 680",
                             300,
                             2,
                             10));
-                    channel.sendMessage("You have installed GTX 680 in your mining farm.");
+
+                    if (added) {
+                        channel.sendMessage("You have installed GTX 680 in your mining farm.");
+                    } else {
+                        channel.sendMessage("You have reached the limit of graphics cards in you farm!");
+                    }
                 } else if (type.equals("graphics_card_2")) {
-                    player.farm.addCard(new GraphicsCard(
+                    boolean added = player.farm.addCard(new GraphicsCard(
                             "graphics_card_2",
                             "GTX 970",
                             1000,
                             3,
                             100));
-                    channel.sendMessage("You have installed GTX 970 in your mining farm.");
+
+                    if (added) {
+                        channel.sendMessage("You have installed GTX 970 in your mining farm.");
+                    } else {
+                        channel.sendMessage("You have reached the limit of graphics cards in you farm!");
+                    }
                 } else if (type.equals("graphics_card_3")) {
-                    player.farm.addCard(new GraphicsCard(
+                    boolean added = player.farm.addCard(new GraphicsCard(
                             "graphics_card_3",
                             "Titan Z",
                             5000,
                             5,
                             500));
-                    channel.sendMessage("You have installed Titan Z in your mining farm.");
+
+                    if (added) {
+                        channel.sendMessage("You have installed Titan Z in your mining farm.");
+                    } else {
+                        channel.sendMessage("You have reached the limit of graphics cards in you farm!");
+                    }
                 }
 
                 // Deleting item from inventory
@@ -157,6 +172,36 @@ public class ConsoleListener implements MessageCreateListener {
                 sendEnvironmentHelp("shop-help.txt");
                 return;
             }
+        } else if (consoleState == ConsoleState.FARM) {
+            if (msg.toLowerCase().contains("uninstall")) {
+                // Getting item number
+                Integer itemNumber = getItemNumber(msg, "uninstall", "farm-help.txt");
+                if (itemNumber == null) return;
+
+                // Getting target GraphicsCard
+                GraphicsCard card;
+                try {
+                    card = player.farm.cards.get(itemNumber - 1);
+                } catch (IndexOutOfBoundsException e) {
+                    e.printStackTrace();
+                    channel.sendMessage("Wrong number!");
+                    return;
+                }
+
+                // Removing card
+                player.farm.removeCard(card);
+                if (player.inventory.containsKey(card.getType())) {
+                    player.inventory.replace(card.getType(), player.inventory.get(card.getType()) + 1);
+                } else {
+                    player.inventory.put(card.getType(), 1);
+                }
+                channel.sendMessage("Graphics card was successfully uninstalled.");
+
+                return;
+            } else if (msg.equalsIgnoreCase("help")) {
+                sendEnvironmentHelp("farm-help.txt");
+                return;
+            }
         }
 
         // SWITCH ENVIRONMENT COMMANDS, HELP, QUIT
@@ -172,6 +217,9 @@ public class ConsoleListener implements MessageCreateListener {
         } else if (msg.equalsIgnoreCase("shop")) {
             consoleState = ConsoleState.SHOP;
             drawShop();
+        } else if (msg.equalsIgnoreCase("farm")) {
+            consoleState = ConsoleState.FARM;
+            drawFarm();
         } else if (msg.equalsIgnoreCase("achievements")) {
 //            consoleState = ConsoleState.ACHIEVEMENTS;
             drawAchievements();
@@ -267,6 +315,23 @@ public class ConsoleListener implements MessageCreateListener {
         new MessageBuilder().setEmbed(embedBuilder).send(channel);
     }
 
+    private void drawFarm() {
+        EmbedBuilder embedBuilder = new EmbedBuilder()
+                .setTitle("FARM")
+                .setDescription("The place where your graphics cards work.")
+                .setColor(Color.CYAN);
+
+        int itemCounter = 1;
+        for (GraphicsCard card : player.farm.cards) {
+            embedBuilder.addField(
+                    itemCounter++ + ". " + card.getName(),
+                    "Efficiency: " + card.getEfficiency());
+        }
+        embedBuilder.setFooter("Average income per minute: " + player.farm.getIncome());
+
+        new MessageBuilder().setEmbed(embedBuilder).send(channel);
+    }
+
     private void drawAchievements() {
         channel.sendMessage("ACHIEVEMENTS environment is not supported yet!");
     }
@@ -317,7 +382,7 @@ public class ConsoleListener implements MessageCreateListener {
         return Arrays.asList(
                 new EnergySupply("coffee", "Coffee", 50, 1, 1),
                 new EnergySupply("energy_drink", "Energy drink", 80, 2, 2),
-                new GraphicsCard("graphics_card_1", "GTX 680", 300, 2, 10),
+                new GraphicsCard("graphics_card_1", "GTX 680", 300, 1, 10),
                 new GraphicsCard("graphics_card_2", "GTX 970", 1000, 3, 100),
                 new GraphicsCard("graphics_card_3", "Titan Z", 5000, 5, 500)
         );

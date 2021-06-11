@@ -9,8 +9,9 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 public class Farm {
+    public List<GraphicsCard> cards;
+
     Player player;
-    List<GraphicsCard> cards;
     int income;
     int limit;
     Thread calculateProfit;
@@ -18,7 +19,7 @@ public class Farm {
     public Farm(Player player) {
         this.player = player;
         this.cards = new ArrayList<>();
-        this.income = 3000;
+        this.income = 0;
         this.limit = 3;
 
         this.calculateProfit = new Thread(() -> {

@@ -5,5 +5,6 @@ public enum ConsoleState {
     CASE,
     SHOP,
     INVENTORY,
+    FARM,
     ACHIEVEMENTS
 }
