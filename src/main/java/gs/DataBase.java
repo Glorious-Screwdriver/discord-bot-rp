@@ -1,9 +1,12 @@
 package gs;
 
+import gs.service.Farm;
 import gs.service.Player;
 import gs.service.PlayerStatistics;
+import gs.service.items.GraphicsCard;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
@@ -33,7 +36,7 @@ public class DataBase {
         }
     }
 
-    public Player getPlayer(Player player) {
+    public synchronized Player getPlayer(Player player) {
         System.out.println("dataBase.getPlayer started");
         String name = player.getDisplayName();
         long playerID = player.getId();
@@ -54,34 +57,36 @@ public class DataBase {
         try {
             //language=SQL
             ResultSet resultSet = statement.executeQuery(String.format("select energy, level, money from players where id = %d", playerID));
-            if(resultSet.next()){
+            if (resultSet.next()) {
                 System.out.println("Nгрок уже есть в базе данных");
                 player.setEnergy(resultSet.getInt("energy"));
                 player.setLevel(resultSet.getInt("level"));
                 player.setMoney(resultSet.getInt("money"));
                 player.inventory = getInventory(playerID);
                 player.statistics = getStatistics(playerID);
-            }else{
+                player.farm.stopCalculatingProfit();
+                player.farm = getFarm(player);
+            } else {
                 System.out.printf("Добавление игрока %s с id: %d в базу данных\n", name, playerID);
                 try {
                     //language=SQL
                     statement.execute(String.format(
-                            "insert into players (id, name, level, money, energy, coffee, energy_drink, graphics_card_1, graphics_card_2, graphics_card_3, acquired_money, cases_done, coffee_consumed, energy_drinks_consumed) " +
-                                    "VALUES(%d,'%s',%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)",
-                            playerID, name, level, money, energy, coffee!=null?coffee:0, energy_drink!=null?energy_drink:0, graphics_card_1!=null?graphics_card_1:0, graphics_card_2!=null?graphics_card_2:0, graphics_card_3!=null?graphics_card_3:0, acquired_money, cases_done, coffee_consumed, energy_drinks_consumed));
+                            "insert into players (id, name, level, money, energy, coffee, energy_drink, graphics_card_1, graphics_card_2, graphics_card_3, acquired_money, cases_done, coffee_consumed, energy_drinks_consumed, graphics_card_1_installed, graphics_card_2_installed,graphics_card_3_installed) " +
+                                    "VALUES(%d,'%s', %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, 0, 0, 0)",
+                            playerID, name, level, money, energy, coffee != null ? coffee : 0, energy_drink != null ? energy_drink : 0, graphics_card_1 != null ? graphics_card_1 : 0, graphics_card_2 != null ? graphics_card_2 : 0, graphics_card_3 != null ? graphics_card_3 : 0, acquired_money, cases_done, coffee_consumed, energy_drinks_consumed));
                     System.out.println("Nгрок был добавлен в базу данных");
                 } catch (SQLException e) {
                     System.err.println("Не удалось добавить игрока в базу данных");
                     e.printStackTrace();
                 }
             }
-        } catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return player;
     }
 
-    public void update(long playerID, String column, int value) {
+    public synchronized void update(long playerID, String column, int value) {
         System.out.printf("Nзменение поля %s, у игрока с id: %d на %d\n", column, playerID, value);
         try {
             //language=SQL
@@ -98,7 +103,12 @@ public class DataBase {
         }
     }
 
-    public int get(long playerID, String column) {
+    public synchronized void increment(long playerID, String column, int value) {
+        System.out.printf("Увеличение поля %s, у игрока с id: %d на %d \n", column, playerID, value);
+        update(playerID, column, get(playerID, column) + value);
+    }
+
+    public synchronized int get(long playerID, String column) {
         try {
             //language=SQL
             ResultSet resultSet = statement.executeQuery(String.format("select %s from players where id = %d", column, playerID));
@@ -127,28 +137,52 @@ public class DataBase {
         return getHashmap(3, query);
     }
 
-    public PlayerStatistics getStatistics(long PlayerID) {
+    public synchronized PlayerStatistics getStatistics(long PlayerID) {
         System.out.printf("Статистика игрока с id %d\n", PlayerID);
         PlayerStatistics statistics = new PlayerStatistics();
         try {
             //language=SQL
             ResultSet resultSet = statement.executeQuery(String.format("select acquired_money, cases_done, coffee_consumed, energy_drinks_consumed from players where id = %d", PlayerID));
-            if(resultSet.next()) {
+            if (resultSet.next()) {
                 int acquired_money = resultSet.getInt("acquired_money");
                 int cases_done = resultSet.getInt("cases_done");
                 int coffee_consumed = resultSet.getInt("coffee_consumed");
                 int energy_drinks_consumed = resultSet.getInt("energy_drinks_consumed");
-                statistics = new PlayerStatistics(acquired_money,cases_done,coffee_consumed,energy_drinks_consumed);
-            }else {
+                statistics = new PlayerStatistics(acquired_money, cases_done, coffee_consumed, energy_drinks_consumed);
+            } else {
                 System.err.println("Nгрок не найден");
             }
-        }catch(SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return statistics;
     }
+    public synchronized Farm getFarm(Player player){
+        System.out.printf("Ферма игрока с id: %d\n",player.getId());
+        Farm farm = new Farm(player);
+        ArrayList<GraphicsCard> cards = new ArrayList<>();
+        try{
+            //language=SQL
+            ResultSet resultSet = statement.executeQuery(String.format("select graphics_card_1_installed, graphics_card_2_installed,graphics_card_3_installed from players where id = %d",player.getId()));
+            if(resultSet.next()){
+                ResultSetMetaData cardNames = resultSet.getMetaData();
+                for(int i = 1; i<=3; i++){
+                    for(int j = 0; j<resultSet.getInt(i); j++){
+                        cards.add(new GraphicsCard(cardNames.getColumnName(i).replace("_installed","")));
+                    }
+                }
+            }else{
+                System.err.println("Nгрок не найден");
+            }
+            farm.addCards(cards);
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
 
-    private LinkedHashMap<String, Integer> getHashmap(int n, String query) {
+        return farm;
+    }
+
+    private synchronized LinkedHashMap<String, Integer> getHashmap(int n, String query) {
         LinkedHashMap<String, Integer> hashmap = new LinkedHashMap<>();
         try {
             ResultSet resultSet = statement.executeQuery(query);
@@ -158,7 +192,7 @@ public class DataBase {
                     Integer value = resultSet.getInt(i);
                     System.out.print(column + ": ");
                     System.out.println(value);
-                    if(value!=0) {
+                    if (value != 0) {
                         hashmap.put(column, value);
                     }
                 }
