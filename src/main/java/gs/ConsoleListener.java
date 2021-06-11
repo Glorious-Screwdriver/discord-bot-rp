@@ -71,6 +71,30 @@ public class ConsoleListener implements MessageCreateListener {
                             player.getEnergy(),
                             player.getMaxEnergy()
                     ));
+                } else if (type.equals("graphics_card_1")) {
+                    player.farm.addCard(new GraphicsCard(
+                            "graphics_card_1",
+                            "GTX 680",
+                            300,
+                            2,
+                            10));
+                    channel.sendMessage("You have installed GTX 680 in your mining farm.");
+                } else if (type.equals("graphics_card_2")) {
+                    player.farm.addCard(new GraphicsCard(
+                            "graphics_card_2",
+                            "GTX 970",
+                            1000,
+                            3,
+                            100));
+                    channel.sendMessage("You have installed GTX 970 in your mining farm.");
+                } else if (type.equals("graphics_card_3")) {
+                    player.farm.addCard(new GraphicsCard(
+                            "graphics_card_3",
+                            "Titan Z",
+                            5000,
+                            5,
+                            500));
+                    channel.sendMessage("You have installed Titan Z in your mining farm.");
                 }
 
                 // Deleting item from inventory
@@ -188,8 +212,8 @@ public class ConsoleListener implements MessageCreateListener {
                 .setColor(Color.BLUE);
 
         List<Item> shop = shop();
-        final int[] itemCounter = {1};
 
+        final int[] itemCounter = {1};
         if (player.inventory.size() > 0) {
             player.inventory.forEach((key, value) -> {
                 String name = null;
@@ -227,6 +251,15 @@ public class ConsoleListener implements MessageCreateListener {
                                 "Price: " + energySupply.getPrice() + "\n" +
                                 "Required level: " + energySupply.getRequiredLevel() + "\n" +
                                 "Energy: " + energySupply.getProvidedEnergy()
+                );
+            } else if (product.getClass() == GraphicsCard.class) {
+                GraphicsCard card = (GraphicsCard) product;
+                embedBuilder.addField(
+                        itemCounter++ + ". " + card.getName(),
+                        card.getDescription() + "\n" +
+                                "Price: " + card.getPrice() + "\n" +
+                                "Required level: " + card.getRequiredLevel() + "\n" +
+                                "Efficiency: " + card.getEfficiency()
                 );
             }
         }

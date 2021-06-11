@@ -19,7 +19,7 @@ public class Player {
         this.displayName = displayName;
         this.discriminator = discriminator;
         this.level = 1;
-        this.money = 200;
+        this.money = 300;
         this.energy = 5;
 
         this.inventory = new LinkedHashMap<>();
