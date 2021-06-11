@@ -293,7 +293,6 @@ public class ConsoleListener implements MessageCreateListener {
             consoleState = ConsoleState.FARM;
             drawFarm();
         } else if (msg.equalsIgnoreCase("achievements")) {
-            consoleState = ConsoleState.ACHIEVEMENTS;
             drawAchievements();
         } else if (msg.equalsIgnoreCase("quit")) {
             channel.sendMessage("Closing console...");
