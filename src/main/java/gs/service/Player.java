@@ -10,14 +10,13 @@ public class Player {
     private final long id;
     private final String displayName;
     private final String discriminator;
+    public LinkedHashMap<String, Integer> inventory;
+    public PlayerStatistics statistics;
+    public Farm farm;
     private int level;
     private int money;
     private int energy;
     private DataBase dataBase;
-
-    public LinkedHashMap <String, Integer> inventory;
-    public PlayerStatistics statistics;
-    public Farm farm;
     private Case activeCase;
 
     public Player(long id, String displayName, String discriminator, DataBase dataBase) {
@@ -35,22 +34,20 @@ public class Player {
         this.activeCase = null;
 
         Thread energyGainer = new Thread(() -> {
-            while (true) {
-                if (energy < getMaxEnergy()) {
-                    try {
+            try {
+                while (true) {
+                    if (energy < getMaxEnergy()) {
                         TimeUnit.MINUTES.sleep(1);
-                        System.out.println(displayName + " restored 1 energy.");
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    energy++;
-                } else {
-                    try {
+                        if (energy < getMaxEnergy()) {
+                            energy++;
+                            System.out.println(displayName + " restored 1 energy.");
+                        }
+                    } else {
                         TimeUnit.SECONDS.sleep(5);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
                     }
                 }
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
         });
         energyGainer.start();
@@ -72,12 +69,24 @@ public class Player {
         return level;
     }
 
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
     public int getMoney() {
         return money;
     }
 
+    public void setMoney(int money) {
+        this.money = money;
+    }
+
     public int getEnergy() {
         return energy;
+    }
+
+    public void setEnergy(int energy) {
+        this.energy = energy;
     }
 
     public int getMaxEnergy() {
@@ -100,18 +109,6 @@ public class Player {
     public void updateEnergy(int x) {
         energy += x;
         dataBase.updatePlayer(this);
-    }
-
-    public void setLevel(int level) {
-        this.level = level;
-    }
-
-    public void setMoney(int money) {
-        this.money = money;
-    }
-
-    public void setEnergy(int energy) {
-        this.energy = energy;
     }
 
     public boolean setActiveCase(Case newCase) {
