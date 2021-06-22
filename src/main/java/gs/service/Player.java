@@ -13,21 +13,21 @@ public class Player {
     private int level;
     private int money;
     private int energy;
-    private DataBase dataBase;
+    private DataBase db;
 
     public LinkedHashMap <String, Integer> inventory;
     public PlayerStatistics statistics;
     public Farm farm;
     private Case activeCase;
 
-    public Player(long id, String displayName, String discriminator, DataBase dataBase) {
+    public Player(long id, String displayName, String discriminator, DataBase db) {
         this.id = id;
         this.displayName = displayName;
         this.discriminator = discriminator;
         this.level = 1;
         this.money = 300;
         this.energy = 5;
-        this.dataBase = dataBase;
+        this.db = db;
 
         this.inventory = new LinkedHashMap<>();
         this.statistics = new PlayerStatistics();
@@ -93,13 +93,19 @@ public class Player {
     }
 
     public void updateMoney(int x) {
-        dataBase.updatePlayer(this);
         money += x;
+
+        if (db != null) {
+            db.updatePlayer(this);
+        }
     }
 
     public void updateEnergy(int x) {
         energy += x;
-        dataBase.updatePlayer(this);
+
+        if (db != null) {
+            db.updatePlayer(this);
+        }
     }
 
     public void setLevel(int level) {
@@ -130,5 +136,16 @@ public class Player {
     @Override
     public String toString() {
         return "Player:" + displayName + "#" + discriminator;
+    }
+
+    @Override
+    public boolean equals(Object another) {
+        Player anotherPlayer;
+        if (another.getClass() == Player.class) {
+            anotherPlayer = (Player) another;
+            return this.getId() == anotherPlayer.getId();
+        } else {
+            throw new IllegalArgumentException("Object is not Player, can't compare");
+        }
     }
 }

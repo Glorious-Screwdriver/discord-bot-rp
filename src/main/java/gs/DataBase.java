@@ -19,22 +19,16 @@ public class DataBase {
     Connection connection;
     Statement statement;
 
-    DataBase() {
+    DataBase() throws SQLException {
         connect();
     }
 
-    private void connect() {
-        try {
-            connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-            statement = connection.createStatement();
+    private void connect() throws SQLException {
+        connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+        statement = connection.createStatement();
 
-            if (!connection.isClosed()) {
-                System.out.println("Соединение с базой данных установлено");
-            }
-
-        } catch (SQLException e) {
-            System.err.println("Не удаЛОСЬ ХАХВХАХ ЛООООСЬ установить соединение с базой данных");
-            e.printStackTrace();
+        if (!connection.isClosed()) {
+            System.out.println("Database connection established.");
         }
     }
 
@@ -136,8 +130,8 @@ public class DataBase {
                     level, money, energy, coffee != null ? coffee : 0, energy_drink != null ? energy_drink : 0,
                     graphics_card_1 != null ? graphics_card_1 : 0, graphics_card_2 != null ? graphics_card_2 : 0,
                     graphics_card_3 != null ? graphics_card_3 : 0, money_spent, cases_done, coffee_consumed, energy_drinks_consumed,
-                    graphics_card_1_installed!=null?graphics_card_1_installed:0, graphics_card_2_installed!=null?graphics_card_2_installed:0,
-                    graphics_card_3_installed!=null?graphics_card_3_installed:0,playerID);
+                    graphics_card_1_installed != null ? graphics_card_1_installed : 0, graphics_card_2_installed != null ? graphics_card_2_installed : 0,
+                    graphics_card_3_installed != null ? graphics_card_3_installed : 0, playerID);
             System.out.println(query);
             statement.executeUpdate(query);
         } catch (SQLException e) {

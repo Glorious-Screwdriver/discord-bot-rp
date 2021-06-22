@@ -1,5 +1,6 @@
 package gs;
 
+import com.mysql.cj.exceptions.CJCommunicationsException;
 import gs.service.Player;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.ServerTextChannel;
@@ -17,17 +18,27 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainChatListener implements MessageCreateListener {
     DiscordApi api;
-    List<Player> active;
-    DataBase dataBase;
+    DataBase db;
+    List<Player> online, offline;
 
-    public MainChatListener(DiscordApi api, List<Player> active) {
-        dataBase = new DataBase();
+    public MainChatListener(DiscordApi api) {
         this.api = api;
-        this.active = active;
+
+        try {
+            db = new DataBase();
+        } catch (SQLException e) {
+            db = null;
+            System.err.println("Database connection failed, working autonomously.");
+        }
+
+        online = new ArrayList<>();
+        offline = new ArrayList<>();
     }
 
     @Override
@@ -38,11 +49,12 @@ public class MainChatListener implements MessageCreateListener {
             new MessageBuilder()
                     .append(getHelpString())
                     .send(event.getChannel());
+
         } else if (msg.equalsIgnoreCase("!console")) {
             MessageAuthor author = event.getMessageAuthor();
 
-            for (Player player : active) {
-                if (player.getId() == author.getId()) {
+            for (Player instance : online) {
+                if (instance.getId() == author.getId()) {
                     event.getChannel().sendMessage("Console is already opened!");
                     return;
                 }
@@ -79,12 +91,32 @@ public class MainChatListener implements MessageCreateListener {
                     author.getId(),
                     author.getDisplayName(),
                     discriminator,
-                    dataBase
+                    db
             );
-            active.add(dataBase.getPlayer(player));
-            System.out.println("New player arrived. Active players now: " + active.toString());
 
-            ConsoleListener console = new ConsoleListener(active, player, channel, dataBase);
+            if (db != null) {
+                online.add(db.getPlayer(player));
+            } else {
+                boolean playerWasFound = false;
+
+                for (Player instance : offline) {
+                    if (player.equals(instance)) {
+                        online.add(instance);
+                        offline.remove(instance);
+                        player = instance;
+                        playerWasFound = true;
+                        break;
+                    }
+                }
+
+                if (!playerWasFound) {
+                    online.add(player);
+                }
+            }
+
+            System.out.println("New player arrived. Active players now: " + online.toString());
+
+            ConsoleListener console = new ConsoleListener(player, channel, db, online, offline);
             channel.addMessageCreateListener(console);
             console.drawHomeScreen();
 
@@ -106,7 +138,9 @@ public class MainChatListener implements MessageCreateListener {
                 }
             }
 
-            active.clear();
+            online.clear();
+            offline.clear();
+
             System.out.println("All players and consoles deleted.");
         }
     }

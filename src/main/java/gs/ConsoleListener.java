@@ -25,18 +25,23 @@ import java.util.*;
 import java.util.List;
 
 public class ConsoleListener implements MessageCreateListener {
-    List<Player> active;
     Player player;
     TextChannel channel;
+    DataBase db;
+    List<Player> online;
+    List<Player> offline;
     ConsoleState consoleState;
-    DataBase dataBase;
 
-    public ConsoleListener(List<Player> active, Player player, TextChannel channel, DataBase dataBase) {
-        this.active = active;
+    public ConsoleListener(
+            Player player, TextChannel channel,
+            DataBase db, List<Player> online, List<Player> offline
+    ) {
         this.player = player;
         this.channel = channel;
+        this.db = db;
+        this.online = online;
+        this.offline = offline;
         consoleState = ConsoleState.HOME;
-        this.dataBase = dataBase;
     }
 
     @Override
@@ -69,7 +74,11 @@ public class ConsoleListener implements MessageCreateListener {
                     case "coffee":
                         player.updateEnergy(1);
                         player.statistics.updateCoffeeConsumed(1);
-                        dataBase.updatePlayer(player);
+
+                        if (db != null) {
+                            db.updatePlayer(player);
+                        }
+
                         channel.sendMessage(String.format(
                                 "You have drank a cup of coffee! Energy: %d/%d",
                                 player.getEnergy(),
@@ -79,7 +88,11 @@ public class ConsoleListener implements MessageCreateListener {
                     case "energy_drink":
                         player.updateEnergy(2);
                         player.statistics.updateEnergyDrinksConsumed(1);
-                        dataBase.updatePlayer(player);
+
+                        if (db != null) {
+                            db.updatePlayer(player);
+                        }
+
                         channel.sendMessage(String.format(
                                 "You have consumed a can of energy drink! Energy: %d/%d",
                                 player.getEnergy(),
@@ -99,7 +112,11 @@ public class ConsoleListener implements MessageCreateListener {
                         }
                         if (card == null) throw new IllegalStateException("Card is null");
                         boolean added = player.farm.addCard(card);
-                        dataBase.updatePlayer(player);
+
+                        if (db != null) {
+                            db.updatePlayer(player);
+                        }
+
                         if (added) {
                             channel.sendMessage(String.format(
                                     "You have installed %s in your mining farm.",
@@ -177,7 +194,10 @@ public class ConsoleListener implements MessageCreateListener {
                 } else {
                     messageBuilder.append("Answer is wrong. Try again or type in \"new\" to get another case");
                 }
-                dataBase.updatePlayer(player);
+
+                if (db != null) {
+                    db.updatePlayer(player);
+                }
 
                 messageBuilder
                         .appendNewLine()
@@ -223,7 +243,11 @@ public class ConsoleListener implements MessageCreateListener {
 
                     player.updateMoney(-item.getPrice());
                     player.statistics.updatemoneySpent(item.getPrice());
-                    dataBase.updatePlayer(player);
+
+                    if (db != null) {
+                        db.updatePlayer(player);
+                    }
+
                     channel.sendMessage(String.format(
                             "You have purchased %s!\nMoney left: %d",
                             item.getName(),
@@ -267,7 +291,11 @@ public class ConsoleListener implements MessageCreateListener {
                     player.inventory.put(card.getType(), 1);
                 }
                 channel.sendMessage("Graphics card was successfully uninstalled.");
-                dataBase.updatePlayer(player);
+
+                if (db != null) {
+                    db.updatePlayer(player);
+                }
+
                 return;
             } else if (msg.equalsIgnoreCase("help")) {
                 sendEnvironmentHelp("farm-help.txt");
@@ -296,11 +324,17 @@ public class ConsoleListener implements MessageCreateListener {
             drawAchievements();
         } else if (msg.equalsIgnoreCase("quit")) {
             channel.sendMessage("Closing console...");
+
             channel.asServerChannel()
                     .orElseThrow(() -> new RuntimeException("Server channel is not present"))
                     .delete("Close console command");
-            active.remove(player);
-            System.out.println("Player disconnected. Active players now: " + active.toString());
+
+            online.remove(player);
+            if (db == null) {
+                offline.add(player);
+            }
+
+            System.out.println("Player disconnected. Active players now: " + online.toString());
         } else if (msg.equalsIgnoreCase("help")) {
             sendEnvironmentHelp("CL-help.txt");
         } else {
