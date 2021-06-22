@@ -2,6 +2,7 @@ package gs.service;
 
 import gs.service.items.GraphicsCard;
 
+import java.nio.channels.ClosedByInterruptException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -12,41 +13,29 @@ public class Farm {
 
     Player player;
     int income;
-    Thread calculateProfit;
+    Thread thread;
 
     public Farm(Player player) {
         this.player = player;
         this.cards = new ArrayList<>();
         this.income = 0;
-
-        this.calculateProfit = new Thread(() -> {
-            Random random = new Random();
-
-            while (true) {
-                try {
-                    TimeUnit.MINUTES.sleep(1);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-                long profit = 0;
-                for (GraphicsCard card : cards) {
-                    profit += Math.round(card.getEfficiency() * (random.nextDouble() + 0.5));
-                }
-                player.updateMoney((int) profit);
-                System.out.println(player.getDisplayName() + "'s farm has produced " + profit);
-            }
-        });
-        calculateProfit.start();
     }
-    public void stopCalculatingProfit(){
-        calculateProfit.interrupt();
+
+    public void start() {
+        thread = thread();
+        thread.start();
     }
+
+    public void stop() {
+        thread.interrupt();
+    }
+
     public int getIncome() {
         return income;
     }
 
     public int getLimit() {
-        int t = this.player.getLevel()-1;
+        int t = this.player.getLevel() - 1;
         return Math.max(t, 0);
     }
 
@@ -77,5 +66,29 @@ public class Farm {
     public void removeCard(GraphicsCard card) {
         income -= card.getEfficiency();
         cards.remove(card);
+    }
+
+    private Thread thread() {
+        return new Thread(() -> {
+            Random random = new Random();
+
+            while (true) {
+                try {
+                    TimeUnit.MINUTES.sleep(1);
+                } catch (InterruptedException e) {
+                    System.out.println(player.getDisplayName() + "'s farm stopped.");
+                    break;
+                }
+
+                int profit = 0;
+                for (GraphicsCard card : cards) {
+                    profit += (int) Math.round(card.getEfficiency() * (random.nextDouble() + 0.5));
+                }
+
+                player.updateMoney(profit);
+                System.out.println(player.getDisplayName() + "'s farm has produced " + profit);
+            }
+
+        });
     }
 }

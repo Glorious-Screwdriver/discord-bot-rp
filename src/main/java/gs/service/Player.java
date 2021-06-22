@@ -10,23 +10,25 @@ public class Player {
     private final long id;
     private final String displayName;
     private final String discriminator;
-    private int level;
-    private int money;
-    private int energy;
-    private DataBase db;
 
-    public LinkedHashMap <String, Integer> inventory;
+    private final DataBase db;
+
+    private int level = 1;
+    private int money = 300;
+    private int energy = 5;
+
+    public LinkedHashMap<String, Integer> inventory;
     public PlayerStatistics statistics;
     public Farm farm;
     private Case activeCase;
+
+    Thread energyThread = null;
 
     public Player(long id, String displayName, String discriminator, DataBase db) {
         this.id = id;
         this.displayName = displayName;
         this.discriminator = discriminator;
-        this.level = 1;
-        this.money = 300;
-        this.energy = 5;
+
         this.db = db;
 
         this.inventory = new LinkedHashMap<>();
@@ -34,26 +36,7 @@ public class Player {
         this.farm = new Farm(this);
         this.activeCase = null;
 
-        Thread energyGainer = new Thread(() -> {
-            while (true) {
-                if (energy < getMaxEnergy()) {
-                    try {
-                        TimeUnit.MINUTES.sleep(1);
-                        System.out.println(displayName + " restored 1 energy.");
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    energy++;
-                } else {
-                    try {
-                        TimeUnit.SECONDS.sleep(5);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
-        energyGainer.start();
+        startEnergyThread();
     }
 
     public long getId() {
@@ -64,20 +47,28 @@ public class Player {
         return displayName;
     }
 
-    public String getDiscriminator() {
-        return discriminator;
-    }
-
     public int getLevel() {
         return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
     }
 
     public int getMoney() {
         return money;
     }
 
+    public void setMoney(int money) {
+        this.money = money;
+    }
+
     public int getEnergy() {
         return energy;
+    }
+
+    public void setEnergy(int energy) {
+        this.energy = energy;
     }
 
     public int getMaxEnergy() {
@@ -88,36 +79,64 @@ public class Player {
         return activeCase;
     }
 
-    public void updateLevel(int x) {
-        level += x;
+    public void updateLevel(int value) {
+        level += value;
     }
 
-    public void updateMoney(int x) {
-        money += x;
+    public void updateMoney(int value) {
+        money += value;
 
         if (db != null) {
             db.updatePlayer(this);
         }
     }
 
-    public void updateEnergy(int x) {
-        energy += x;
+    public void updateEnergy(int value) {
+        energy += value;
+
+        if (getEnergy() < getMaxEnergy()) {
+            if (!energyThreadRunning()) {
+                startEnergyThread();
+            }
+        } else if (getEnergy() >= getMaxEnergy()) {
+            if (energyThreadRunning()) {
+                stopEnergyThread();
+            }
+        }
 
         if (db != null) {
             db.updatePlayer(this);
         }
     }
 
-    public void setLevel(int level) {
-        this.level = level;
+    private void startEnergyThread() {
+        energyThread = energyThread();
+        energyThread.start();
+        System.out.println(getDisplayName() + "'s energy thread started.");
     }
 
-    public void setMoney(int money) {
-        this.money = money;
+    private void stopEnergyThread() {
+        energyThread.interrupt();
     }
 
-    public void setEnergy(int energy) {
-        this.energy = energy;
+    private boolean energyThreadRunning() {
+        return energyThread.isAlive();
+    }
+
+    private Thread energyThread() {
+        return new Thread(() -> {
+            while (getEnergy() < getMaxEnergy()) {
+                try {
+                    TimeUnit.MINUTES.sleep(1);
+                } catch (InterruptedException e) {
+                    break;
+                }
+                energy++;
+                System.out.println(displayName + " restored energy.");
+            }
+
+            System.out.println(getDisplayName() + "'s energy thread stopped.");
+        });
     }
 
     public boolean setActiveCase(Case newCase) {

@@ -66,27 +66,6 @@ public class MainChatListener implements MessageCreateListener {
             String discriminator = author.getDiscriminator()
                     .orElseThrow(() -> new RuntimeException("Discriminator is not present"));
 
-            ServerTextChannel channel = new ServerTextChannelBuilder(server)
-                    .setName("console-" + discriminator)
-                    .addPermissionOverwrite(server.getEveryoneRole(),
-                            new PermissionsBuilder()
-                                    .setState(PermissionType.READ_MESSAGES, PermissionState.DENIED)
-                                    .build()
-                    )
-                    .addPermissionOverwrite(
-                            author.asUser()
-                                    .orElseThrow(() -> new RuntimeException("User is not present")),
-                            new PermissionsBuilder()
-                                    .setState(PermissionType.READ_MESSAGES, PermissionState.ALLOWED)
-                                    .build())
-                    .addPermissionOverwrite(
-                            api.getYourself(),
-                            new PermissionsBuilder()
-                                    .setState(PermissionType.READ_MESSAGES, PermissionState.ALLOWED)
-                                    .build())
-                    .create()
-                    .join();
-
             Player player = new Player(
                     author.getId(),
                     author.getDisplayName(),
@@ -114,11 +93,34 @@ public class MainChatListener implements MessageCreateListener {
                 }
             }
 
-            System.out.println("New player arrived. Active players now: " + online.toString());
+            player.farm.start();
+
+            ServerTextChannel channel = new ServerTextChannelBuilder(server)
+                    .setName("console-" + discriminator)
+                    .addPermissionOverwrite(server.getEveryoneRole(),
+                            new PermissionsBuilder()
+                                    .setState(PermissionType.READ_MESSAGES, PermissionState.DENIED)
+                                    .build()
+                    )
+                    .addPermissionOverwrite(
+                            author.asUser()
+                                    .orElseThrow(() -> new RuntimeException("User is not present")),
+                            new PermissionsBuilder()
+                                    .setState(PermissionType.READ_MESSAGES, PermissionState.ALLOWED)
+                                    .build())
+                    .addPermissionOverwrite(
+                            api.getYourself(),
+                            new PermissionsBuilder()
+                                    .setState(PermissionType.READ_MESSAGES, PermissionState.ALLOWED)
+                                    .build())
+                    .create()
+                    .join();
 
             ConsoleListener console = new ConsoleListener(player, channel, db, online, offline);
             channel.addMessageCreateListener(console);
             console.drawHomeScreen();
+
+            System.out.println("New player arrived. Active players now: " + online.toString());
 
         } else if (msg.equalsIgnoreCase("!clear")) {
             if (!event.getMessageAuthor().canManageRolesOnServer()) {

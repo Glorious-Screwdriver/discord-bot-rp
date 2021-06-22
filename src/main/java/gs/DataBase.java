@@ -60,7 +60,7 @@ public class DataBase {
                 player.setMoney(resultSet.getInt("money"));
                 player.inventory = getInventory(playerID);
                 player.statistics = getStatistics(playerID);
-                player.farm.stopCalculatingProfit();
+                player.farm.stop();
                 player.farm = getFarm(player);
             } else {
                 System.out.printf("Добавление игрока %s с id: %d в базу данных\n", name, playerID);
