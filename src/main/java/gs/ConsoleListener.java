@@ -326,6 +326,7 @@ public class ConsoleListener implements MessageCreateListener {
             channel.sendMessage("Closing console...");
 
             player.farm.stop();
+            player.stopEnergyThread();
 
             channel.asServerChannel()
                     .orElseThrow(() -> new RuntimeException("Server channel is not present"))

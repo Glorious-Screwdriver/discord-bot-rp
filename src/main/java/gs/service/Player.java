@@ -109,14 +109,14 @@ public class Player {
         }
     }
 
+    public void stopEnergyThread() {
+        energyThread.interrupt();
+    }
+
     private void startEnergyThread() {
         energyThread = energyThread();
         energyThread.start();
         System.out.println(getDisplayName() + "'s energy thread started.");
-    }
-
-    private void stopEnergyThread() {
-        energyThread.interrupt();
     }
 
     private boolean energyThreadRunning() {
