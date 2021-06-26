@@ -1,6 +1,5 @@
 package gs;
 
-import com.mysql.cj.exceptions.CJCommunicationsException;
 import gs.service.Player;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.ServerTextChannel;
@@ -93,6 +92,7 @@ public class MainChatListener implements MessageCreateListener {
                 }
             }
 
+            player.startEnergyThread();
             player.farm.start();
 
             ServerTextChannel channel = new ServerTextChannelBuilder(server)

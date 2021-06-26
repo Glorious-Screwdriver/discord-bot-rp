@@ -35,8 +35,6 @@ public class Player {
         this.statistics = new PlayerStatistics();
         this.farm = new Farm(this);
         this.activeCase = null;
-
-        startEnergyThread();
     }
 
     public long getId() {
@@ -95,11 +93,11 @@ public class Player {
         energy += value;
 
         if (getEnergy() < getMaxEnergy()) {
-            if (!energyThreadRunning()) {
+            if (!energyThread.isAlive()) {
                 startEnergyThread();
             }
         } else if (getEnergy() >= getMaxEnergy()) {
-            if (energyThreadRunning()) {
+            if (energyThread.isAlive()) {
                 stopEnergyThread();
             }
         }
@@ -109,23 +107,11 @@ public class Player {
         }
     }
 
-    public void stopEnergyThread() {
-        energyThread.interrupt();
-    }
+    public void startEnergyThread() {
+        energyThread = new Thread(() -> {
+            System.out.println(displayName + "'s energy thread started.");
 
-    private void startEnergyThread() {
-        energyThread = energyThread();
-        energyThread.start();
-        System.out.println(getDisplayName() + "'s energy thread started.");
-    }
-
-    private boolean energyThreadRunning() {
-        return energyThread.isAlive();
-    }
-
-    private Thread energyThread() {
-        return new Thread(() -> {
-            while (getEnergy() < getMaxEnergy()) {
+            while (energy < getMaxEnergy()) {
                 try {
                     TimeUnit.MINUTES.sleep(1);
                 } catch (InterruptedException e) {
@@ -135,8 +121,13 @@ public class Player {
                 System.out.println(displayName + " restored energy.");
             }
 
-            System.out.println(getDisplayName() + "'s energy thread stopped.");
+            System.out.println(displayName + "'s energy thread stopped.");
         });
+        energyThread.start();
+    }
+
+    public void stopEnergyThread() {
+        energyThread.interrupt();
     }
 
     public boolean setActiveCase(Case newCase) {

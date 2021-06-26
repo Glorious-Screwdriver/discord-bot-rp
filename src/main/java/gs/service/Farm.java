@@ -2,7 +2,6 @@ package gs.service;
 
 import gs.service.items.GraphicsCard;
 
-import java.nio.channels.ClosedByInterruptException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -22,7 +21,28 @@ public class Farm {
     }
 
     public void start() {
-        thread = thread();
+        thread = new Thread(() -> {
+            System.out.println(player.getDisplayName() + "'s farm started.");
+
+            Random random = new Random();
+
+            while (!thread.isInterrupted()) {
+                try {
+                    TimeUnit.MINUTES.sleep(1);
+                } catch (InterruptedException e) {
+                    System.out.println(player.getDisplayName() + "'s farm stopped.");
+                    break;
+                }
+
+                int profit = 0;
+                for (GraphicsCard card : cards) {
+                    profit += (int) Math.round(card.getEfficiency() * (random.nextDouble() + 0.5));
+                }
+
+                player.updateMoney(profit);
+                System.out.println(player.getDisplayName() + "'s farm has produced " + profit);
+            }
+        });
         thread.start();
     }
 
@@ -66,29 +86,5 @@ public class Farm {
     public void removeCard(GraphicsCard card) {
         income -= card.getEfficiency();
         cards.remove(card);
-    }
-
-    private Thread thread() {
-        return new Thread(() -> {
-            Random random = new Random();
-
-            while (true) {
-                try {
-                    TimeUnit.MINUTES.sleep(1);
-                } catch (InterruptedException e) {
-                    System.out.println(player.getDisplayName() + "'s farm stopped.");
-                    break;
-                }
-
-                int profit = 0;
-                for (GraphicsCard card : cards) {
-                    profit += (int) Math.round(card.getEfficiency() * (random.nextDouble() + 0.5));
-                }
-
-                player.updateMoney(profit);
-                System.out.println(player.getDisplayName() + "'s farm has produced " + profit);
-            }
-
-        });
     }
 }
