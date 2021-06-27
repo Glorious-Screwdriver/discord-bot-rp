@@ -1,4 +1,4 @@
-package gs.util.states;
+package gs.service.states;
 
 import gs.DataBase;
 import gs.service.Player;

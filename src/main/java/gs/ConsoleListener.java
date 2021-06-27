@@ -2,7 +2,7 @@ package gs;
 
 import gs.service.Player;
 import gs.util.*;
-import gs.util.states.*;
+import gs.service.states.*;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.listener.message.MessageCreateListener;
