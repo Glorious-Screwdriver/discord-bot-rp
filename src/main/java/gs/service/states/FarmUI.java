@@ -11,7 +11,7 @@ import org.javacord.api.event.message.MessageCreateEvent;
 
 import java.awt.*;
 
-public class FarmState implements State {
+public class FarmUI implements UI {
     @Override
     public void draw(TextChannel channel, Player player) {
         EmbedBuilder embedBuilder = new EmbedBuilder()

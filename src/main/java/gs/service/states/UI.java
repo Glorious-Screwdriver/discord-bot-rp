@@ -5,7 +5,7 @@ import gs.service.Player;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.event.message.MessageCreateEvent;
 
-public interface State {
+public interface UI {
     /**
      * Draws environment information
      * @param channel Target channel

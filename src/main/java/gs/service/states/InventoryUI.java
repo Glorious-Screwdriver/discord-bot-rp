@@ -15,7 +15,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class InventoryState implements State {
+public class InventoryUI implements UI {
     /**
      * Shows player's items
      * @param channel Target text channel

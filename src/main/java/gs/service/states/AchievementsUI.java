@@ -12,7 +12,7 @@ import org.javacord.api.event.message.MessageCreateEvent;
 import java.awt.*;
 import java.util.List;
 
-public class AchievementsState implements State {
+public class AchievementsUI implements UI {
     @Override
     public void draw(TextChannel channel, Player player) {
         EmbedBuilder embedBuilder = new EmbedBuilder()

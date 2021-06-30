@@ -9,7 +9,7 @@ import org.javacord.api.event.message.MessageCreateEvent;
 
 import java.awt.*;
 
-public class HomeState implements State {
+public class HomeUI implements UI {
     @Override
     public void draw(TextChannel channel, Player player) {
         new MessageBuilder()

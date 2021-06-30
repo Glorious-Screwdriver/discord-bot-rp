@@ -15,7 +15,7 @@ import org.javacord.api.event.message.MessageCreateEvent;
 import java.awt.*;
 import java.util.List;
 
-public class ShopState implements State {
+public class ShopUI implements UI {
     /**
      * Shows all purchasable items
      * @param channel Target channel

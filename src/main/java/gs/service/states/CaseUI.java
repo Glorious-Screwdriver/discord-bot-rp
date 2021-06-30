@@ -21,7 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-public class CaseState implements State {
+public class CaseUI implements UI {
     /**
      * If a player has an active case, opens it. Otherwise gets a new one from the base
      * @param channel Target text channel

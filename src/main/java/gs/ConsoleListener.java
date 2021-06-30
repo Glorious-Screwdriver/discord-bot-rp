@@ -15,7 +15,7 @@ public class ConsoleListener implements MessageCreateListener {
     DataBase db;
     List<Player> online;
     List<Player> offline;
-    State state;
+    UI ui;
 
     public ConsoleListener(
             Player player, TextChannel channel,
@@ -26,11 +26,12 @@ public class ConsoleListener implements MessageCreateListener {
         this.db = db;
         this.online = online;
         this.offline = offline;
-        this.state = new HomeState();
+
+        this.ui = new HomeUI();
     }
 
-    private void changeState(State state) {
-        this.state = state;
+    private void changeUI(UI UI) {
+        this.ui = UI;
     }
 
     @Override
@@ -58,27 +59,27 @@ public class ConsoleListener implements MessageCreateListener {
             return;
         }
 
-        boolean processed = state.readCommand(event, player, db);
+        boolean processed = ui.readCommand(event, player, db);
 
         if (!processed) {
             switch (msg) {
                 case "home":
-                    changeState(new HomeState());
+                    changeUI(new HomeUI());
                     break;
                 case "case":
-                    changeState(new CaseState());
+                    changeUI(new CaseUI());
                     break;
                 case "inventory":
-                    changeState(new InventoryState());
+                    changeUI(new InventoryUI());
                     break;
                 case "shop":
-                    changeState(new ShopState());
+                    changeUI(new ShopUI());
                     break;
                 case "farm":
-                    changeState(new FarmState());
+                    changeUI(new FarmUI());
                     break;
                 case "achievements":
-                    changeState(new AchievementsState());
+                    changeUI(new AchievementsUI());
                     break;
 
                 case "help":
@@ -88,11 +89,11 @@ public class ConsoleListener implements MessageCreateListener {
                     channel.sendMessage("Undefined command. For more information type in \"help\".");
                     return;
             }
-            state.draw(channel, player);
+            ui.draw(channel, player);
         }
     }
 
-    public void drawCurrentState() {
-        state.draw(channel, player);
+    public void drawCurrentUI() {
+        ui.draw(channel, player);
     }
 }
