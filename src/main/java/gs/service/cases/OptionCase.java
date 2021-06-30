@@ -7,11 +7,7 @@ public class OptionCase extends Case {
     private final int answer;
 
     public OptionCase(String name, String description, int profit, List<String> options, int answer) {
-
-        // those are read from file
-        this.name = name;
-        this.description = description;
-        this.profit = profit;
+        super(name, description, profit);
         this.options = options;
         this.answer = answer;
     }

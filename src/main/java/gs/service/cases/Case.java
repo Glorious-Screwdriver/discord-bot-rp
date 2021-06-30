@@ -10,6 +10,12 @@ public abstract class Case {
 
     protected Player player;
 
+    public Case(String name, String description, int profit) {
+        this.name = name;
+        this.description = description;
+        this.profit = profit;
+    }
+
     public String getName() {
         return name;
     }
