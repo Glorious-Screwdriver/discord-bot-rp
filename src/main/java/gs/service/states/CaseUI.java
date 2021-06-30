@@ -37,7 +37,6 @@ public class CaseUI implements UI {
             List<Case> cases = new ArrayList<>();
 
             // Option cases initialisation
-
             Path optionCasesPath = Paths.get("src/main/java/gs/materials/option-cases.txt");
 
             List<String> optionCasesLines;
@@ -60,7 +59,6 @@ public class CaseUI implements UI {
             }
 
             // String cases initialisation
-
             Path stringCasesPath = Paths.get("src/main/java/gs/materials/string-cases.txt");
 
             List<String> stringCasesLines;
@@ -81,14 +79,12 @@ public class CaseUI implements UI {
             }
 
             // Assigning case to the player
-
             Random random = new Random();
             aCase = cases.get(random.nextInt(cases.size()));
             aCase.assignToPlayer(player);
         }
 
         // Printing case
-
         EmbedBuilder embedBuilder = new EmbedBuilder()
                 .setTitle(aCase.getName())
                 .setDescription(aCase.getDescription() + "\n" +
@@ -129,7 +125,6 @@ public class CaseUI implements UI {
             }
 
             // Getting answer
-
             String content = msg.replace("solve ", "");
 
             if (content.equals("")) {
@@ -138,7 +133,6 @@ public class CaseUI implements UI {
             }
 
             // Solving case
-
             boolean solved = false;
             Case activeCase = player.getActiveCase();
             if (activeCase.getClass() == OptionCase.class) {

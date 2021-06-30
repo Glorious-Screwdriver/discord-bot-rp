@@ -62,8 +62,8 @@ public class ShopUI implements UI {
         TextChannel channel = event.getChannel();
 
         if (msg.contains("buy")) {
-            // Getting item number
 
+            // Getting item number
             String content = msg.replace("buy ", "");
 
             int itemNumber;
@@ -76,7 +76,6 @@ public class ShopUI implements UI {
             }
 
             // Getting target Item
-
             List<Item> shop = Shop.getItemList();
             Item item;
             try {
@@ -88,7 +87,6 @@ public class ShopUI implements UI {
             }
 
             // Purchasing
-
             if (player.getMoney() >= item.getPrice() && player.getLevel() >= item.getRequiredLevel()) {
                 String type = item.getType();
 

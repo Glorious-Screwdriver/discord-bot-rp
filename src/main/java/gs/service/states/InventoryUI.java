@@ -70,7 +70,6 @@ public class InventoryUI implements UI {
             }
 
             // Getting item type
-
             List<String> keyList = new ArrayList<>(player.inventory.keySet());
             String type;
             try {
@@ -82,7 +81,6 @@ public class InventoryUI implements UI {
             }
 
             // Applying item effect
-
             switch (type) {
                 case "coffee":
                     player.updateEnergy(1);
@@ -142,7 +140,6 @@ public class InventoryUI implements UI {
             }
 
             // Deleting item from inventory
-
             if (player.inventory.get(type) == 1) {
                 player.inventory.remove(type);
             } else {

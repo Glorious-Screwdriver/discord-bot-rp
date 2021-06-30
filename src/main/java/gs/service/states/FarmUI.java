@@ -51,7 +51,6 @@ public class FarmUI implements UI {
             }
 
             // Getting target GraphicsCard
-
             GraphicsCard card;
             try {
                 card = player.farm.cards.get(itemNumber - 1);
@@ -62,7 +61,6 @@ public class FarmUI implements UI {
             }
 
             // Uninstalling card
-
             player.farm.removeCard(card);
             if (player.inventory.containsKey(card.getType())) {
                 player.inventory.replace(card.getType(), player.inventory.get(card.getType()) + 1);
