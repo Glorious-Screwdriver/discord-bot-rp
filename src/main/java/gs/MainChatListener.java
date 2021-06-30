@@ -118,7 +118,7 @@ public class MainChatListener implements MessageCreateListener {
 
             ConsoleListener console = new ConsoleListener(player, channel, db, online, offline);
             channel.addMessageCreateListener(console);
-            console.drawHomeScreen();
+            console.drawCurrentUI();
 
             System.out.println("New player arrived. Active players now: " + online.toString());
 
