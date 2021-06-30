@@ -2,10 +2,9 @@ package gs.service.ui;
 
 import gs.DataBase;
 import gs.service.Player;
-import gs.service.items.GraphicsCard;
 import gs.service.items.Item;
 import gs.util.Helper;
-import gs.util.Shop;
+import gs.util.Items;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
@@ -28,19 +27,10 @@ public class InventoryUI implements UI {
                 .setDescription("These are the things you own.")
                 .setColor(Color.BLUE);
 
-        List<Item> shop = Shop.getItemList();
-
         final int[] itemCounter = {1};
         if (player.inventory.size() > 0) {
             player.inventory.forEach((key, value) -> {
-                String name = null;
-                for (Item item : shop) {
-                    if (item.getType().equals(key)) {
-                        name = item.getName();
-                        break;
-                    }
-                }
-                if (name == null) throw new IllegalStateException("Name is null");
+                String name = Items.get(key).getName();
                 embedBuilder.addField(itemCounter[0]++ + ". " + name, "Quantity: " + value);
             });
         } else {
@@ -56,8 +46,8 @@ public class InventoryUI implements UI {
         TextChannel channel = event.getChannel();
 
         if (msg.contains("use")) {
-            // Getting item number
 
+            // Getting item number
             String content = msg.replace("use ", "");
 
             int itemNumber;
@@ -69,7 +59,7 @@ public class InventoryUI implements UI {
                 return true;
             }
 
-            // Getting item type
+            // Getting item object
             List<String> keyList = new ArrayList<>(player.inventory.keySet());
             String type;
             try {
@@ -80,63 +70,14 @@ public class InventoryUI implements UI {
                 return true;
             }
 
+            Item item = Items.get(type);
+
             // Applying item effect
-            switch (type) {
-                case "coffee":
-                    player.updateEnergy(1);
-                    player.statistics.updateCoffeeConsumed(1);
+            String response = item.use(player);
+            channel.sendMessage(response);
 
-                    if (db != null) {
-                        db.updatePlayer(player);
-                    }
-
-                    channel.sendMessage(String.format(
-                            "You have drank a cup of coffee! Energy: %d/%d",
-                            player.getEnergy(),
-                            player.getMaxEnergy()
-                    ));
-                    break;
-                case "energy_drink":
-                    player.updateEnergy(2);
-                    player.statistics.updateEnergyDrinksConsumed(1);
-
-                    if (db != null) {
-                        db.updatePlayer(player);
-                    }
-
-                    channel.sendMessage(String.format(
-                            "You have consumed a can of energy drink! Energy: %d/%d",
-                            player.getEnergy(),
-                            player.getMaxEnergy()
-                    ));
-                    break;
-                case "graphics_card_1":
-                case "graphics_card_2":
-                case "graphics_card_3":
-                    List<Item> shop = Shop.getItemList();
-                    GraphicsCard card = null;
-                    for (Item product : shop) {
-                        if (product.getType().equals(type)) {
-                            card = (GraphicsCard) product;
-                            break;
-                        }
-                    }
-                    if (card == null) throw new IllegalStateException("Card is null");
-                    boolean added = player.farm.addCard(card);
-
-                    if (db != null) {
-                        db.updatePlayer(player);
-                    }
-
-                    if (added) {
-                        channel.sendMessage(String.format(
-                                "You have installed %s in your mining farm.",
-                                card.getName()
-                        ));
-                    } else {
-                        channel.sendMessage("You have reached the limit of graphics cards in you farm!");
-                    }
-                    break;
+            if (db != null) {
+                db.updatePlayer(player);
             }
 
             // Deleting item from inventory

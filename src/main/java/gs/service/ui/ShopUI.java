@@ -6,7 +6,7 @@ import gs.service.items.EnergySupply;
 import gs.service.items.GraphicsCard;
 import gs.service.items.Item;
 import gs.util.Helper;
-import gs.util.Shop;
+import gs.util.Items;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
@@ -28,7 +28,7 @@ public class ShopUI implements UI {
                 .setDescription("The place, where you can buy stuff.")
                 .setColor(Color.GREEN);
 
-        List<Item> shop = Shop.getItemList();
+        List<Item> shop = Items.getItemList();
         int itemCounter = 1;
 
         for (Item product : shop) {
@@ -76,7 +76,7 @@ public class ShopUI implements UI {
             }
 
             // Getting target Item
-            List<Item> shop = Shop.getItemList();
+            List<Item> shop = Items.getItemList();
             Item item;
             try {
                 item = shop.get(itemNumber - 1);

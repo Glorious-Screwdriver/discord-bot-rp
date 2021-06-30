@@ -1,5 +1,7 @@
 package gs.service.items;
 
+import gs.service.Player;
+
 public abstract class Item {
     protected String type;
     protected String name;
@@ -14,6 +16,13 @@ public abstract class Item {
         this.price = price;
         this.requiredLevel = requiredLevel;
     }
+
+    /**
+     * Applies certain effect to the player according to the item type
+     * @param player Affected player
+     * @return Text response, that will be sent to player's console
+     */
+    public abstract String use(Player player);
 
     public String getType() {
         return type;
